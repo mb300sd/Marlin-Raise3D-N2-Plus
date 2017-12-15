@@ -335,7 +335,11 @@ uint8_t Temperature::soft_pwm_amount[HOTENDS],
               SERIAL_PROTOCOLPAIR(MSG_BIAS, bias);
               SERIAL_PROTOCOLPAIR(MSG_D, d);
               SERIAL_PROTOCOLPAIR(MSG_T_MIN, min);
-              SERIAL_PROTOCOLPAIR(MSG_T_MAX, max);
+              #ifdef N_SERIES_PROTOCOL
+                SERIAL_PROTOCOLLNPAIR(MSG_T_MAX, max);
+              #else
+                SERIAL_PROTOCOLPAIR(MSG_T_MAX, max);
+              #endif
               if (cycles > 2) {
                 Ku = (4.0 * d) / (M_PI * (max - min) * 0.5);
                 Tu = ((float)(t_low + t_high) * 0.001);
@@ -345,8 +349,13 @@ uint8_t Temperature::soft_pwm_amount[HOTENDS],
                 workKi = 2 * workKp / Tu;
                 workKd = workKp * Tu * 0.125;
                 SERIAL_PROTOCOLLNPGM("\n" MSG_CLASSIC_PID);
-                SERIAL_PROTOCOLPAIR(MSG_KP, workKp);
-                SERIAL_PROTOCOLPAIR(MSG_KI, workKi);
+                #ifdef N_SERIES_PROTOCOL
+                  SERIAL_PROTOCOLLNPAIR(MSG_KP, workKp);
+                  SERIAL_PROTOCOLLNPAIR(MSG_KI, workKi);
+                #else
+                  SERIAL_PROTOCOLPAIR(MSG_KP, workKp);
+                  SERIAL_PROTOCOLPAIR(MSG_KI, workKi);
+                #endif
                 SERIAL_PROTOCOLLNPAIR(MSG_KD, workKd);
                 /**
                 workKp = 0.33*Ku;
@@ -389,7 +398,12 @@ uint8_t Temperature::soft_pwm_amount[HOTENDS],
       // Every 2 seconds...
       if (ELAPSED(ms, temp_ms + 2000UL)) {
         #if HAS_TEMP_HOTEND || HAS_TEMP_BED
-          print_heaterstates();
+          #ifdef N_SERIES_PROTOCOL
+            SERIAL_PROTOCOLPAIR(MSG_T, input);
+            SERIAL_PROTOCOLPAIR(MSG_AT, soft_pwm_amount[hotend]);
+          #else
+            print_heaterstates();
+          #endif
           SERIAL_EOL();
         #endif
 

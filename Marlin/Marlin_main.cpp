@@ -349,7 +349,7 @@
                            || isnan(ubl.z_values[0][0]))
 #endif
 
-#if ENABLED(NEOPIXEL_LED) 
+#if ENABLED(NEOPIXEL_LED)
   #if NEOPIXEL_TYPE == NEO_RGB || NEOPIXEL_TYPE == NEO_RBG || NEOPIXEL_TYPE == NEO_GRB || NEOPIXEL_TYPE == NEO_GBR || NEOPIXEL_TYPE == NEO_BRG || NEOPIXEL_TYPE == NEO_BGR
     #define NEO_WHITE 255, 255, 255
   #else
@@ -1158,6 +1158,10 @@ inline void get_serial_commands() {
           while (command[count] != '*') checksum ^= command[count++];
 
           if (strtol(apos + 1, NULL, 10) != checksum) {
+
+            const String str = command;  /* Raise3D */
+            SERIAL_PROTOCOL(str);
+
             gcode_line_error(PSTR(MSG_ERR_CHECKSUM_MISMATCH));
             return;
           }
@@ -7410,12 +7414,41 @@ inline void gcode_M105() {
 
   #if HAS_TEMP_HOTEND || HAS_TEMP_BED
     SERIAL_PROTOCOLPGM(MSG_OK);
+
+  #ifdef N_SERIES_PROTOCOL
+    SERIAL_PROTOCOLPGM(" T:");
+    SERIAL_PROTOCOL_F(thermalManager.degHotend(target_extruder), 1);
+    SERIAL_PROTOCOLPGM(" /");
+    SERIAL_PROTOCOL_F((double)thermalManager.degTargetHotend(target_extruder), 1);
+    SERIAL_PROTOCOLPGM(" B:");
+    SERIAL_PROTOCOL_F(thermalManager.degBed(), 1);
+    SERIAL_PROTOCOLPGM(" /");
+    SERIAL_PROTOCOL_F((double)thermalManager.degTargetBed(), 1);
+    HOTEND_LOOP() {
+    //for (int8_t e = 0; e < 2; e++) { /* always print for 2 even if not DUAL */
+      SERIAL_PROTOCOLPGM(" T");
+      SERIAL_PROTOCOL(e);
+      SERIAL_PROTOCOLPGM(":");
+      SERIAL_PROTOCOL_F(thermalManager.degHotend(e), 1);
+      SERIAL_PROTOCOLPGM(" /");
+      SERIAL_PROTOCOL_F((double)thermalManager.degTargetHotend(e), 1);
+      SERIAL_PROTOCOLPGM(" F");
+      SERIAL_PROTOCOLCHAR('0' + e);
+      SERIAL_PROTOCOLCHAR(':');
+      SERIAL_PROTOCOL(flow_percentage[e]);
+    }
+    SERIAL_PROTOCOLPGM(" S:");
+    SERIAL_PROTOCOL(fanSpeeds[0]);
+    SERIAL_PROTOCOLPGM(" P:");
+    SERIAL_PROTOCOL(feedrate_percentage);
+  #else
     print_heaterstates();
+  #endif
+
   #else // !HAS_TEMP_HOTEND && !HAS_TEMP_BED
     SERIAL_ERROR_START();
     SERIAL_ERRORLNPGM(MSG_ERR_NO_THERMISTORS);
   #endif
-
   SERIAL_EOL();
 }
 
@@ -7583,14 +7616,50 @@ inline void gcode_M109() {
     now = millis();
     if (ELAPSED(now, next_temp_ms)) { //Print temp & remaining time every 1s while waiting
       next_temp_ms = now + 1000UL;
+
+    #ifdef N_SERIES_PROTOCOL
+      SERIAL_PROTOCOLPGM("T:");
+      SERIAL_PROTOCOL_F(thermalManager.degHotend(target_extruder),1);
+      SERIAL_PROTOCOLPGM(" E:");
+      SERIAL_PROTOCOL((int)target_extruder);
+    #else
       print_heaterstates();
-      #if TEMP_RESIDENCY_TIME > 0
-        SERIAL_PROTOCOLPGM(" W:");
-        if (residency_start_ms)
-          SERIAL_PROTOCOL(long((((TEMP_RESIDENCY_TIME) * 1000UL) - (now - residency_start_ms)) / 1000UL));
-        else
-          SERIAL_PROTOCOLCHAR('?');
-      #endif
+    #endif
+
+    #if TEMP_RESIDENCY_TIME > 0
+      SERIAL_PROTOCOLPGM(" W:");
+      if (residency_start_ms)
+        SERIAL_PROTOCOL(long((((TEMP_RESIDENCY_TIME) * 1000UL) - (now - residency_start_ms)) / 1000UL));
+      else
+        SERIAL_PROTOCOLCHAR('?');
+    #endif
+
+    #ifdef N_SERIES_PROTOCOL
+      SERIAL_PROTOCOLPGM(" D:");
+      SERIAL_PROTOCOL_F((double)thermalManager.degTargetHotend(target_extruder),1);
+      SERIAL_PROTOCOLPGM(" B:");
+      SERIAL_PROTOCOL_F(thermalManager.degBed(), 1);
+      SERIAL_PROTOCOLPGM(" /");
+      SERIAL_PROTOCOL_F((double)thermalManager.degTargetBed(), 1);
+      HOTEND_LOOP() {
+      //for (int8_t e = 0; e < 2; e++) { /* always print for 2 even if not DUAL */
+        SERIAL_PROTOCOLPGM(" T");
+        SERIAL_PROTOCOL(e);
+        SERIAL_PROTOCOLPGM(":");
+        SERIAL_PROTOCOL_F(thermalManager.degHotend(e), 1);
+        SERIAL_PROTOCOLPGM(" /");
+        SERIAL_PROTOCOL_F((double)thermalManager.degTargetHotend(e), 1);
+        SERIAL_PROTOCOLPGM(" F");
+        SERIAL_PROTOCOLCHAR('0' + e);
+        SERIAL_PROTOCOLCHAR(':');
+        SERIAL_PROTOCOL(flow_percentage[e]);
+      }
+      SERIAL_PROTOCOLPGM(" S:");
+      SERIAL_PROTOCOL(fanSpeeds[0]);
+      SERIAL_PROTOCOLPGM(" P:");
+      SERIAL_PROTOCOL(feedrate_percentage);
+    #endif
+
       SERIAL_EOL();
     }
 
@@ -7728,7 +7797,40 @@ inline void gcode_M109() {
       now = millis();
       if (ELAPSED(now, next_temp_ms)) { //Print Temp Reading every 1 second while heating up.
         next_temp_ms = now + 1000UL;
+
+      #ifdef N_SERIES_PROTOCOL
+        SERIAL_PROTOCOLPGM("T:");
+        SERIAL_PROTOCOL_F(thermalManager.degHotend(target_extruder),1);
+        SERIAL_PROTOCOLPGM(" E:");
+        SERIAL_PROTOCOL((int)target_extruder);
+        SERIAL_PROTOCOLPGM(" B:");
+        SERIAL_PROTOCOL_F(thermalManager.degBed(),1);
+        SERIAL_PROTOCOLPGM(" D:");
+        SERIAL_PROTOCOL_F((double)thermalManager.degTargetBed(),1);
+        SERIAL_PROTOCOLPGM(" B:");
+        SERIAL_PROTOCOL_F(thermalManager.degBed(), 1);
+        SERIAL_PROTOCOLPGM(" /");
+        SERIAL_PROTOCOL_F((double)thermalManager.degTargetBed(), 1);
+        HOTEND_LOOP() {
+        //for (int8_t e = 0; e < 2; e++) { /* always print for 2 even if not DUAL */
+          SERIAL_PROTOCOLPGM(" T");
+          SERIAL_PROTOCOL(e);
+          SERIAL_PROTOCOLPGM(":");
+          SERIAL_PROTOCOL_F(thermalManager.degHotend(e), 1);
+          SERIAL_PROTOCOLPGM(" /");
+          SERIAL_PROTOCOL_F((double)thermalManager.degTargetHotend(e), 1);
+          SERIAL_PROTOCOLPGM(" F");
+          SERIAL_PROTOCOLCHAR('0' + e);
+          SERIAL_PROTOCOLCHAR(':');
+          SERIAL_PROTOCOL(flow_percentage[e]);
+        }
+        SERIAL_PROTOCOLPGM(" S:");
+        SERIAL_PROTOCOL(fanSpeeds[0]);
+        SERIAL_PROTOCOLPGM(" P:");
+        SERIAL_PROTOCOL(feedrate_percentage);
+      #else
         print_heaterstates();
+
         #if TEMP_BED_RESIDENCY_TIME > 0
           SERIAL_PROTOCOLPGM(" W:");
           if (residency_start_ms)
@@ -7736,6 +7838,8 @@ inline void gcode_M109() {
           else
             SERIAL_PROTOCOLCHAR('?');
         #endif
+      #endif
+
         SERIAL_EOL();
       }
 
@@ -8805,6 +8909,14 @@ inline void gcode_M221() {
   if (get_target_extruder_from_command(221)) return;
   if (parser.seenval('S'))
     flow_percentage[target_extruder] = parser.value_int();
+
+#ifdef N_SERIES_PROTOCOL
+  /* Strange response here for Raise3D */
+  SERIAL_PROTOCOLLN(flow_percentage[target_extruder]);
+  SERIAL_PROTOCOLLN(target_extruder);
+  SERIAL_PROTOCOLLN(flow_percentage[0]);
+  SERIAL_PROTOCOLLN(flow_percentage[1]);
+#endif
 }
 
 /**
@@ -11727,6 +11839,16 @@ void ok_to_send() {
     SERIAL_PROTOCOLPGM(" P"); SERIAL_PROTOCOL(int(BLOCK_BUFFER_SIZE - planner.movesplanned() - 1));
     SERIAL_PROTOCOLPGM(" B"); SERIAL_PROTOCOL(BUFSIZE - commands_in_queue);
   #endif
+
+  #ifdef N_SERIES_PROTOCOL
+    SERIAL_PROTOCOL(':');
+    if (planner.block_buffer_tail == planner.block_buffer_head) {
+      SERIAL_PROTOCOL(0);
+    } else {
+      SERIAL_PROTOCOL((planner.block_buffer_head - planner.block_buffer_tail + BLOCK_BUFFER_SIZE)%BLOCK_BUFFER_SIZE);
+    }
+  #endif
+
   SERIAL_EOL();
 }
 
@@ -13431,7 +13553,9 @@ void setup() {
     SERIAL_ECHOPGM(MSG_CONFIGURATION_VER);
     SERIAL_ECHOPGM(STRING_DISTRIBUTION_DATE);
     SERIAL_ECHOLNPGM(MSG_AUTHOR STRING_CONFIG_H_AUTHOR);
-    SERIAL_ECHO_START();
+    #ifndef N_SERIES_PROTOCOL
+      SERIAL_ECHO_START();
+    #endif
     SERIAL_ECHOLNPGM("Compiled: " __DATE__);
   #endif
 

@@ -1384,26 +1384,33 @@ void MarlinSettings::reset() {
     /**
      * Announce current units, in case inches are being displayed
      */
+#ifndef N_SERIES_PROTOCOL
     CONFIG_ECHO_START;
+#endif
+
     #if ENABLED(INCH_MODE_SUPPORT)
       #define LINEAR_UNIT(N) ((N) / parser.linear_unit_factor)
       #define VOLUMETRIC_UNIT(N) ((N) / (volumetric_enabled ? parser.volumetric_unit_factor : parser.linear_unit_factor))
+#ifndef N_SERIES_PROTOCOL
       SERIAL_ECHOPGM("  G2");
       SERIAL_CHAR(parser.linear_unit_factor == 1.0 ? '1' : '0');
       SERIAL_ECHOPGM(" ; Units in ");
       serialprintPGM(parser.linear_unit_factor == 1.0 ? PSTR("mm\n") : PSTR("inches\n"));
+#endif
     #else
       #define LINEAR_UNIT(N) N
       #define VOLUMETRIC_UNIT(N) N
+#ifndef N_SERIES_PROTOCOL
       SERIAL_ECHOLNPGM("  G21    ; Units in mm");
+#endif
     #endif
 
     #if ENABLED(ULTIPANEL)
 
       // Temperature units - for Ultipanel temperature options
 
-      CONFIG_ECHO_START;
       #if ENABLED(TEMPERATURE_UNITS_SUPPORT)
+        CONFIG_ECHO_START;
         #define TEMP_UNIT(N) parser.to_temp_units(N)
         SERIAL_ECHOPGM("  M149 ");
         SERIAL_CHAR(parser.temp_units_code());
@@ -1411,11 +1418,15 @@ void MarlinSettings::reset() {
         serialprintPGM(parser.temp_units_name());
       #else
         #define TEMP_UNIT(N) N
-        SERIAL_ECHOLNPGM("  M149 C ; Units in Celsius");
+        #ifndef N_SERIES_PROTOCOL
+          CONFIG_ECHO_START;
+          SERIAL_ECHOLNPGM("  M149 C ; Units in Celsius");
+        #endif
       #endif
 
     #endif
 
+#ifndef N_SERIES_PROTOCOL
     SERIAL_EOL();
 
     /**
@@ -1458,6 +1469,7 @@ void MarlinSettings::reset() {
       CONFIG_ECHO_START;
       SERIAL_ECHOLNPGM("  M200 D0");
     }
+#endif
 
     if (!forReplay) {
       CONFIG_ECHO_START;
@@ -1481,7 +1493,11 @@ void MarlinSettings::reset() {
 
     if (!forReplay) {
       CONFIG_ECHO_START;
+#ifdef N_SERIES_PROTOCOL
+      SERIAL_ECHOLNPGM("Maximum feedrates (mm/s):");
+#else
       SERIAL_ECHOLNPGM("Maximum feedrates (units/s):");
+#endif
     }
     CONFIG_ECHO_START;
     SERIAL_ECHOPAIR("  M203 X", LINEAR_UNIT(planner.max_feedrate_mm_s[X_AXIS]));
@@ -1501,7 +1517,11 @@ void MarlinSettings::reset() {
 
     if (!forReplay) {
       CONFIG_ECHO_START;
+#ifdef N_SERIES_PROTOCOL
+      SERIAL_ECHOLNPGM("Maximum Acceleration (mm/s2):");
+#else
       SERIAL_ECHOLNPGM("Maximum Acceleration (units/s2):");
+#endif
     }
     CONFIG_ECHO_START;
     SERIAL_ECHOPAIR("  M201 X", LINEAR_UNIT(planner.max_acceleration_mm_per_s2[X_AXIS]));
@@ -1521,7 +1541,11 @@ void MarlinSettings::reset() {
 
     if (!forReplay) {
       CONFIG_ECHO_START;
+#ifdef N_SERIES_PROTOCOL
+      SERIAL_ECHOLNPGM("Accelerations: P=printing, R=retract and T=travel");
+#else
       SERIAL_ECHOLNPGM("Acceleration (units/s2): P<print_accel> R<retract_accel> T<travel_accel>");
+#endif
     }
     CONFIG_ECHO_START;
     SERIAL_ECHOPAIR("  M204 P", LINEAR_UNIT(planner.acceleration));
@@ -1530,21 +1554,31 @@ void MarlinSettings::reset() {
 
     if (!forReplay) {
       CONFIG_ECHO_START;
+#ifdef N_SERIES_PROTOCOL
+      SERIAL_ECHOLNPGM("Advanced variables: S=Min feedrate (mm/s), T=Min travel feedrate (mm/s), B=minimum segment time (ms), X=maximum XY jerk (mm/s),  Z=maximum Z jerk (mm/s),  E=maximum E jerk (mm/s)");
+#else
       SERIAL_ECHOLNPGM("Advanced: S<min_feedrate> T<min_travel_feedrate> B<min_segment_time_ms> X<max_xy_jerk> Z<max_z_jerk> E<max_e_jerk>");
+#endif
     }
     CONFIG_ECHO_START;
     SERIAL_ECHOPAIR("  M205 S", LINEAR_UNIT(planner.min_feedrate_mm_s));
     SERIAL_ECHOPAIR(" T", LINEAR_UNIT(planner.min_travel_feedrate_mm_s));
     SERIAL_ECHOPAIR(" B", planner.min_segment_time);
     SERIAL_ECHOPAIR(" X", LINEAR_UNIT(planner.max_jerk[X_AXIS]));
-    SERIAL_ECHOPAIR(" Y", LINEAR_UNIT(planner.max_jerk[Y_AXIS]));
+    #ifndef N_SERIES_PROTOCOL
+      SERIAL_ECHOPAIR(" Y", LINEAR_UNIT(planner.max_jerk[Y_AXIS]));
+    #endif
     SERIAL_ECHOPAIR(" Z", LINEAR_UNIT(planner.max_jerk[Z_AXIS]));
     SERIAL_ECHOLNPAIR(" E", LINEAR_UNIT(planner.max_jerk[E_AXIS]));
 
     #if HAS_M206_COMMAND
       if (!forReplay) {
         CONFIG_ECHO_START;
+#ifdef N_SERIES_PROTOCOL
+        SERIAL_ECHOLNPGM("Home offset (mm):");
+#else
         SERIAL_ECHOLNPGM("Home offset:");
+#endif
       }
       CONFIG_ECHO_START;
       SERIAL_ECHOPAIR("  M206 X", LINEAR_UNIT(home_offset[X_AXIS]));
@@ -1667,6 +1701,7 @@ void MarlinSettings::reset() {
       SERIAL_ECHOLNPAIR("  M666 Z", LINEAR_UNIT(z_endstop_adj));
     #endif // DELTA
 
+#ifndef N_SERIES_PROTOCOL
     #if ENABLED(ULTIPANEL)
       if (!forReplay) {
         CONFIG_ECHO_START;
@@ -1680,6 +1715,7 @@ void MarlinSettings::reset() {
         SERIAL_ECHOLNPAIR(" F", lcd_preheat_fan_speed[i]);
       }
     #endif // ULTIPANEL
+#endif
 
     #if HAS_PID_HEATING
 
@@ -1768,16 +1804,34 @@ void MarlinSettings::reset() {
 
     #endif // FWRETRACT
 
+#ifdef N_SERIES_PROTOCOL
+    /**
+     * Volumetric extrusion M200
+     */
+    if (!forReplay) {
+      CONFIG_ECHO_START;
+      SERIAL_ECHOPGM("Filament settings:");
+      if (volumetric_enabled)
+        SERIAL_EOL();
+      else
+        SERIAL_ECHOLNPGM(" Disabled");
+    }
+#endif
+
     /**
      * Auto Bed Leveling
      */
-    #if HAS_BED_PROBE
+    #if HAS_BED_PROBE || ENABLED(N_SERIES_PROTOCOL)
       if (!forReplay) {
         CONFIG_ECHO_START;
         SERIAL_ECHOLNPGM("Z-Probe Offset (mm):");
       }
       CONFIG_ECHO_START;
-      SERIAL_ECHOLNPAIR("  M851 Z", LINEAR_UNIT(zprobe_zoffset));
+      #if ENABLED(N_SERIES_PROTOCOL)
+        SERIAL_ECHOLNPGM(" M851 Z0.00");
+      #else
+        SERIAL_ECHOLNPAIR("  M851 Z", LINEAR_UNIT(zprobe_zoffset));
+      #endif
     #endif
 
     /**
