@@ -104,15 +104,16 @@
 
 /*=====Raise3D modified======*/
 #define N_SERIES_PROTOCOL
-#define N1
-//#define N2
+//#define N1
+#define N2
 //#define N2PLUS
-//#define DUAL    //Un-comment this line to get dual head version firmware.
-#define BONDTECH  //Un-comment this line to get Bondtech extruder firmware.
+//#define DUAL            //Un-comment this line to get dual head version firmware.
+//#define BONDTECH        //Un-comment this line to get Bondtech extruder firmware (can be combined with DUAL).
+//#define BONDTECH_BMG    //Un-comment this line to get Bondtech BMG extruder firmware (can be combined with DUAL).
 
-#define ABH_HOTEND
+//#define ABH_HOTEND
 //#define ABH_HEATBED
-#define ABH_Y_SIZE_EXTENSION
+//#define ABH_Y_SIZE_EXTENSION
 
 /**
  * This setting determines the communication speed of the printer.
@@ -568,7 +569,9 @@
  * following movement settings. If fewer factors are given than the
  * total number of extruders, the last value applies to the rest.
  */
-//#define DISTINCT_E_FACTORS
+#ifdef DUAL
+  #define DISTINCT_E_FACTORS
+#endif
 
 /**
  * Default Axis Steps Per Unit (steps/mm)
@@ -577,9 +580,17 @@
  */
 
 #ifdef BONDTECH
-  #define DEFAULT_AXIS_STEPS_PER_UNIT   {80, 80, 200*16/4, 140}  /* Bondtech extruder */
+  #ifdef DUAL
+    #define DEFAULT_AXIS_STEPS_PER_UNIT   {80, 80, 200*16/4, 140, 476.5}  /* E0 is Bondtech mini (direct drive), E1 is Bondtech QR (for bowden) */
+  #else
+    #define DEFAULT_AXIS_STEPS_PER_UNIT   {80, 80, 200*16/4, 140}  /* Bondtech mini (direct drive) */
+  #endif
 #else
-  #define DEFAULT_AXIS_STEPS_PER_UNIT   {80, 80, 200*16/4, 94}  /* Raise3D defaults */
+  #ifdef BONDTECH_BMG
+    #define DEFAULT_AXIS_STEPS_PER_UNIT   {80, 80, 200*16/4, 415}  /* Bondtech BMG extruders(s) (direct drive) */
+  #else
+    #define DEFAULT_AXIS_STEPS_PER_UNIT   {80, 80, 200*16/4, 94}  /* Raise3D stock extruder(s) */
+  #endif
 #endif
 
 /**
