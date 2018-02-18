@@ -789,7 +789,7 @@ void Planner::_buffer_steps(const int32_t (&target)[XYZE], float fr_mm_s, const 
 
   const float esteps_float = de * e_factor[extruder];
   const int32_t esteps = abs(esteps_float) + 0.5;
-  SERIAL_PROTOCOLLN(esteps);
+  // SERIAL_PROTOCOLLN(esteps); /* Raise3D */
 
   // Calculate the buffer head after we push this byte
   const uint8_t next_buffer_head = next_block_index(block_buffer_head);

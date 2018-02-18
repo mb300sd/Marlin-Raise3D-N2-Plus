@@ -497,6 +497,12 @@
 //============================= Mechanical Settings =========================
 //===========================================================================
 
+/* Raise3D Lack of material testing */
+#define ENDSTOPPULLUP_E0_LACK
+#define ENDSTOPPULLUP_E1_LACK
+const bool E0_LACK_ENDSTOP_INVERTING = true; // set to true to invert the logic of the endstop.
+const bool E1_LACK_ENDSTOP_INVERTING = true; // set to true to invert the logic of the endstop.
+
 // @section machine
 
 // Uncomment one of these options to enable CoreXY, CoreXZ, or CoreYZ kinematics
