@@ -50,8 +50,13 @@
 #define Z_MIN_PIN          33
 #define Z_MAX_PIN          -1  /* Raise3D */
 
-#define E0_MATERIAL_LACK_PIN    34  /* Raise3D */
-#define E1_MATERIAL_LACK_PIN    32  /* Raise3D */
+#ifdef ABH_RUNOUT_SENSOR
+  #define E0_MATERIAL_LACK_PIN    14  /* Left extruder,  P2 connector pin 3 (PJ1) */
+  #define E1_MATERIAL_LACK_PIN    15  /* Right extruder, P2 connector pin 4 (PJ0) */
+#else
+  #define E0_MATERIAL_LACK_PIN    34  /* Raise3D */
+  #define E1_MATERIAL_LACK_PIN    32  /* Raise3D */
+#endif
 
 //
 // Z Probe (when not Z_MIN_PIN)
