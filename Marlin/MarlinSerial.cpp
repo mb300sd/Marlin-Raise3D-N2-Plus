@@ -153,7 +153,8 @@
                 wait_for_user = wait_for_heatup = false;
                 break;
               case state_M112:
-                kill(PSTR(MSG_KILLED));
+                kill_m112 = true; /* Raise3D */
+                // kill(PSTR(MSG_KILLED));
                 break;
               case state_M410:
                 quickstop_stepper();
