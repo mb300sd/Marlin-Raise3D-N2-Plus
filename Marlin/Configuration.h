@@ -108,7 +108,7 @@
 //#define N2
 //#define N2PLUS
 //#define DUAL            //Un-comment this line to get dual head version firmware.
-#define BONDTECH        //Un-comment this line to get Bondtech extruder firmware (can be combined with DUAL).
+#define BONDTECH_MINI   //Un-comment this line to get Bondtech extruder firmware (can be combined with DUAL).
 //#define BONDTECH_BMG    //Un-comment this line to get Bondtech BMG extruder firmware (can be combined with DUAL).
 
 #define ABH_RUNOUT_SENSOR
@@ -155,7 +155,7 @@
 #endif
 
 // Generally expected filament diameter (1.75, 2.85, 3.0, ...). Used for Volumetric, Filament Width Sensor, etc.
-#define DEFAULT_NOMINAL_FILAMENT_DIA 3.0
+#define DEFAULT_NOMINAL_FILAMENT_DIA 1.75
 
 // For Cyclops or any "multi-extruder" that shares a single nozzle.
 //#define SINGLENOZZLE
@@ -586,7 +586,7 @@ const bool E1_LACK_ENDSTOP_INVERTING = true; // set to true to invert the logic 
  *                                      X, Y, Z, E0 [, E1[, E2[, E3[, E4]]]]
  */
 
-#ifdef BONDTECH
+#ifdef BONDTECH_MINI
   #ifdef DUAL
     #define DEFAULT_AXIS_STEPS_PER_UNIT   {80, 80, 200*16/4, 140, 476.5}  /* E0 is Bondtech mini (direct drive), E1 is Bondtech QR (for bowden) */
   #else
