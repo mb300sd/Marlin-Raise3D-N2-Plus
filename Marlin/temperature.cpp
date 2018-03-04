@@ -752,6 +752,11 @@ float Temperature::get_pid_output(const int8_t e) {
  */
 void Temperature::manage_heater() {
 
+
+  #if ENABLED(EMERGENCY_PARSER)
+    if (killed_by_M112) kill(PSTR(MSG_KILLED));
+  #endif
+
   if (!temp_meas_ready) return;
 
   updateTemperaturesFromRawValues(); // also resets the watchdog

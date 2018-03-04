@@ -78,6 +78,8 @@
 
   #if ENABLED(EMERGENCY_PARSER)
 
+    bool killed_by_M112; // = false
+
     #include "stepper.h"
     #include "language.h"
 
@@ -153,8 +155,7 @@
                 wait_for_user = wait_for_heatup = false;
                 break;
               case state_M112:
-                kill_m112 = true; /* Raise3D */
-                // kill(PSTR(MSG_KILLED));
+                killed_by_M112 = true;
                 break;
               case state_M410:
                 quickstop_stepper();

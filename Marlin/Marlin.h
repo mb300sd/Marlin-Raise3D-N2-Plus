@@ -219,7 +219,6 @@ extern bool axis_relative_modes[];
 extern bool axis_known_position[XYZ];
 extern bool axis_homed[XYZ];
 extern volatile bool wait_for_heatup;
-extern volatile bool kill_m112; /* Raise3D */
 
 #if HAS_RESUME_CONTINUE
   extern volatile bool wait_for_user;

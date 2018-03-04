@@ -496,9 +496,6 @@ static bool relative_mode = false;
 // For M109 and M190, this flag may be cleared (by M108) to exit the wait loop
 volatile bool wait_for_heatup = true;
 
-// Raise3D
-volatile bool kill_m112 = false;
-
 // For M0/M1, this flag may be cleared (by M108) to exit the wait-for-user loop
 #if HAS_RESUME_CONTINUE
   volatile bool wait_for_user = false;
@@ -14322,12 +14319,6 @@ void idle(
   #if ENABLED(MAX7219_DEBUG)
     Max7219_idle_tasks();
   #endif  // MAX7219_DEBUG
-
-  if (kill_m112) {  /* Raise3D */
-    // emergency_parser() caught an M112 that we serve now
-    kill_m112 = false;
-    kill(PSTR(MSG_KILLED));
-  }
 
   lcd_update();
 
