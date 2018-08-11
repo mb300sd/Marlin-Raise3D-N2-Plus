@@ -2128,9 +2128,6 @@ void MarlinSettings::reset() {
 
     if (!forReplay) {
       CONFIG_ECHO_START;
-#ifdef N_SERIES_PROTOCOL
-      SERIAL_ECHOLNPGM("Advanced variables: S=Min feedrate (mm/s), T=Min travel feedrate (mm/s), B=minimum segment time (ms), X=maximum XY jerk (mm/s),  Z=maximum Z jerk (mm/s),  E=maximum E jerk (mm/s)");
-#else
       SERIAL_ECHOPGM("Advanced: B<min_segment_time_us> S<min_feedrate> T<min_travel_feedrate>");
       #if ENABLED(JUNCTION_DEVIATION)
         SERIAL_ECHOPGM(" J<junc_dev>");
@@ -2141,7 +2138,6 @@ void MarlinSettings::reset() {
         SERIAL_ECHOPGM(" E<max_e_jerk>");
       #endif
       SERIAL_EOL();
-#endif
     }
     CONFIG_ECHO_START;
     SERIAL_ECHOPAIR("  M205 B", LINEAR_UNIT(planner.min_segment_time_us));
@@ -2151,11 +2147,9 @@ void MarlinSettings::reset() {
     #if ENABLED(JUNCTION_DEVIATION)
       SERIAL_ECHOPAIR(" J", LINEAR_UNIT(planner.junction_deviation_mm));
     #else
-    SERIAL_ECHOPAIR(" X", LINEAR_UNIT(planner.max_jerk[X_AXIS]));
-    #ifndef N_SERIES_PROTOCOL
+      SERIAL_ECHOPAIR(" X", LINEAR_UNIT(planner.max_jerk[X_AXIS]));
       SERIAL_ECHOPAIR(" Y", LINEAR_UNIT(planner.max_jerk[Y_AXIS]));
-    #endif
-    SERIAL_ECHOPAIR(" Z", LINEAR_UNIT(planner.max_jerk[Z_AXIS]));
+      SERIAL_ECHOPAIR(" Z", LINEAR_UNIT(planner.max_jerk[Z_AXIS]));
       SERIAL_ECHOPAIR(" E", LINEAR_UNIT(planner.max_jerk[E_AXIS]));
     #endif
 
@@ -2440,7 +2434,7 @@ void MarlinSettings::reset() {
     /**
      * Probe Offset
      */
-    #if HAS_BED_PROBE
+    #if HAS_BED_PROBE || ENABLED(N_SERIES_PROTOCOL)
       if (!forReplay) {
         CONFIG_ECHO_START;
 #if ENABLED(N_SERIES_PROTOCOL)
@@ -2718,6 +2712,13 @@ void MarlinSettings::reset() {
         #endif // EXTRUDERS > 2
       #endif // EXTRUDERS == 1
     #endif // ADVANCED_PAUSE_FEATURE
+
+
+#ifdef N_SERIES_PROTOCOL
+    SERIAL_ECHO_START();
+    SERIAL_ECHOLNPGM(MSG_SD_INIT_FAIL);
+#endif
+
   }
 
 #endif // !DISABLE_M503

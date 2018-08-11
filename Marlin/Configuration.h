@@ -109,17 +109,16 @@
 
 /*=====Raise3D modified======*/
 #define N_SERIES_PROTOCOL
-#define N1
-//#define N2
+//#define N1
+#define N2
 //#define N2PLUS
-//#define DUAL            //Un-comment this line to get dual head version firmware.
-#define BONDTECH_MINI   //Un-comment this line to get Bondtech extruder firmware (can be combined with DUAL).
+#define DUAL            //Un-comment this line to get dual head version firmware.
+//#define BONDTECH_MINI   //Un-comment this line to get Bondtech extruder firmware (can be combined with DUAL).
 //#define BONDTECH_BMG    //Un-comment this line to get Bondtech BMG extruder firmware (can be combined with DUAL).
 
-#define ABH_RUNOUT_SENSOR
-#define ABH_HOTEND
-//#define ABH_HEATBED
-#define ABH_Y_SIZE_EXTENSION
+//#define ABH_RUNOUT_SENSOR
+//#define ABH_HOTEND
+//#define ABH_Y_SIZE_EXTENSION
 
 /**
  * This setting determines the communication speed of the printer.
@@ -464,25 +463,19 @@
 
   //#define PID_BED_DEBUG // Sends debug data to the serial port.
 
-  #ifdef ABH_HEATBED
-    #define  DEFAULT_bedKp 140.6
-    #define  DEFAULT_bedKi 27.5
-    #define  DEFAULT_bedKd 179.69
-  #else
-    //120V 250W silicone heater into 4mm borosilicate (MendelMax 1.5+)
-    //from FOPDT model - kp=.39 Tp=405 Tdead=66, Tc set to 79.2, aggressive factor of .15 (vs .1, 1, 10)
-    #define  DEFAULT_bedKp 10.00
-    #define  DEFAULT_bedKi .023
-    #define  DEFAULT_bedKd 305.4
+  //120V 250W silicone heater into 4mm borosilicate (MendelMax 1.5+)
+  //from FOPDT model - kp=.39 Tp=405 Tdead=66, Tc set to 79.2, aggressive factor of .15 (vs .1, 1, 10)
+  #define  DEFAULT_bedKp 10.00
+  #define  DEFAULT_bedKi .023
+  #define  DEFAULT_bedKd 305.4
 
-    //120V 250W silicone heater into 4mm borosilicate (MendelMax 1.5+)
-    //from pidautotune
-    //#define  DEFAULT_bedKp 97.1
-    //#define  DEFAULT_bedKi 1.41
-    //#define  DEFAULT_bedKd 1675.16
+  //120V 250W silicone heater into 4mm borosilicate (MendelMax 1.5+)
+  //from pidautotune
+  //#define  DEFAULT_bedKp 97.1
+  //#define  DEFAULT_bedKi 1.41
+  //#define  DEFAULT_bedKd 1675.16
 
-    // FIND YOUR OWN: "M303 E-1 C8 S90" to run autotune on the bed at 90 degreesC for 8 cycles.
-  #endif
+  // FIND YOUR OWN: "M303 E-1 C8 S90" to run autotune on the bed at 90 degreesC for 8 cycles.
 #endif // PIDTEMPBED
 
 // @section extruder
@@ -1506,7 +1499,8 @@ const bool E1_LACK_ENDSTOP_INVERTING = true; // set to true to invert the logic 
  * you must uncomment the following option or it won't work.
  *
  */
-#define SDSUPPORT
+// Raise3D don't enable. Dummy MSG_SD_INIT_FAIL sent in end of M503 response.
+//#define SDSUPPORT
 
 /**
  * SD CARD: SPI SPEED
@@ -1736,6 +1730,7 @@ const bool E1_LACK_ENDSTOP_INVERTING = true; // set to true to invert the logic 
 // RepRapDiscount FULL GRAPHIC Smart Controller
 // http://reprap.org/wiki/RepRapDiscount_Full_Graphic_Smart_Controller
 //
+// Raise3D: Can be used or not
 //#define REPRAP_DISCOUNT_FULL_GRAPHIC_SMART_CONTROLLER
 
 //
