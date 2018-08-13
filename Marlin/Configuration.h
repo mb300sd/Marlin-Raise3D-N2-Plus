@@ -1731,7 +1731,7 @@ const bool E1_LACK_ENDSTOP_INVERTING = true; // set to true to invert the logic 
 // http://reprap.org/wiki/RepRapDiscount_Full_Graphic_Smart_Controller
 //
 // Raise3D: Can be used or not
-//#define REPRAP_DISCOUNT_FULL_GRAPHIC_SMART_CONTROLLER
+#define REPRAP_DISCOUNT_FULL_GRAPHIC_SMART_CONTROLLER
 
 //
 // ReprapWorld Graphical LCD
