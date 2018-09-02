@@ -119,6 +119,7 @@
 //#define ABH_RUNOUT_SENSOR
 //#define ABH_HOTEND
 //#define ABH_Y_SIZE_EXTENSION
+//#define ABH_NO_GRAPHIC_CONTROLLER
 
 /**
  * This setting determines the communication speed of the printer.
@@ -1296,7 +1297,8 @@ const bool E1_LACK_ENDSTOP_INVERTING = true; // set to true to invert the logic 
 // M501 - reads parameters from EEPROM (if you need reset them after you changed them temporarily).
 // M502 - reverts to the default "factory settings".  You still need to store them in EEPROM afterwards if you want to.
 //
-//#define EEPROM_SETTINGS // Enable for M500 and M501 commands
+// Raise3D EEPROM can be enabled or not
+#define EEPROM_SETTINGS // Enable for M500 and M501 commands
 //#define DISABLE_M503    // Saves ~2700 bytes of PROGMEM. Disable for release!
 #define EEPROM_CHITCHAT   // Give feedback on EEPROM commands. Disable to save PROGMEM.
 
@@ -1731,7 +1733,9 @@ const bool E1_LACK_ENDSTOP_INVERTING = true; // set to true to invert the logic 
 // http://reprap.org/wiki/RepRapDiscount_Full_Graphic_Smart_Controller
 //
 // Raise3D: Can be used or not
+#ifndef ABH_NO_GRAPHIC_CONTROLLER
 #define REPRAP_DISCOUNT_FULL_GRAPHIC_SMART_CONTROLLER
+#endif
 
 //
 // ReprapWorld Graphical LCD
