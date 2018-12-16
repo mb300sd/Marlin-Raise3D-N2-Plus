@@ -110,11 +110,11 @@
 /*=====Raise3D modified======*/
 #define N_SERIES_PROTOCOL
 //#define N1
-#define N2
-//#define N2PLUS
+//#define N2
+#define N2PLUS
 #define DUAL            //Un-comment this line to get dual head version firmware.
 //#define BONDTECH_MINI   //Un-comment this line to get Bondtech extruder firmware (can be combined with DUAL).
-//#define BONDTECH_BMG    //Un-comment this line to get Bondtech BMG extruder firmware (can be combined with DUAL).
+#define BONDTECH_BMG    //Un-comment this line to get Bondtech BMG extruder firmware (can be combined with DUAL).
 
 //#define ABH_RUNOUT_SENSOR
 //#define ABH_HOTEND
@@ -365,12 +365,12 @@
 // When temperature exceeds max temp, your heater will be switched off.
 // This feature exists to protect your hotend from overheating accidentally, but *NOT* from thermistor short/failure!
 // You should use MINTEMP for thermistor short/failure protection.
-#define HEATER_0_MAXTEMP 320
-#define HEATER_1_MAXTEMP 320
-#define HEATER_2_MAXTEMP 320
-#define HEATER_3_MAXTEMP 320
-#define HEATER_4_MAXTEMP 320
-#define BED_MAXTEMP 120
+#define HEATER_0_MAXTEMP 500
+#define HEATER_1_MAXTEMP 500
+#define HEATER_2_MAXTEMP 500
+#define HEATER_3_MAXTEMP 500
+#define HEATER_4_MAXTEMP 500
+#define BED_MAXTEMP 250
 
 //===========================================================================
 //============================= PID Settings ================================
@@ -945,8 +945,8 @@ const bool E1_LACK_ENDSTOP_INVERTING = true; // set to true to invert the logic 
 #endif
 
 #ifdef N2PLUS
-#define X_BED_SIZE 305
-#define Y_BED_SIZE 305
+#define X_BED_SIZE 312
+#define Y_BED_SIZE 308
 #define Z_MAX_POS  610
 #endif
 

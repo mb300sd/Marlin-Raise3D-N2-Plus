@@ -135,12 +135,12 @@
 //
 #define HEATER_0_PIN        2
 #define HEATER_1_PIN        3
-#define HEATER_2_PIN        6
-#define HEATER_3_PIN        8
+//#define HEATER_2_PIN        6 //xxx
+//#define HEATER_3_PIN        8 //xxx
 #define HEATER_BED_PIN      9
 
 #ifndef FAN_PIN
-  #define FAN_PIN           7
+  #define FAN_PIN           6//7
 #endif
 #define FAN1_PIN            8
 
