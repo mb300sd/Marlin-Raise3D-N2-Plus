@@ -1734,7 +1734,7 @@ const bool E1_LACK_ENDSTOP_INVERTING = true; // set to true to invert the logic 
 //
 // Raise3D: Can be used or not
 #ifndef ABH_NO_GRAPHIC_CONTROLLER
-#define REPRAP_DISCOUNT_FULL_GRAPHIC_SMART_CONTROLLER
+//#define REPRAP_DISCOUNT_FULL_GRAPHIC_SMART_CONTROLLER
 #endif
 
 //
