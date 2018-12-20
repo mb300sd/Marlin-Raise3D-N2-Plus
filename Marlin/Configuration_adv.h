@@ -58,6 +58,13 @@
   #endif
 #endif
 
+#if DISABLED(PIDTEMPCHAMBER)
+  #define CHAMBER_CHECK_INTERVAL 5000 // ms between checks in bang-bang control
+  #if ENABLED(CHAMBER_LIMIT_SWITCHING)
+    #define CHAMBER_HYSTERESIS 2 // Only disable heating if T>target+BED_HYSTERESIS and enable heating if T>target-BED_HYSTERESIS
+  #endif
+#endif
+
 /**
  * Thermal Protection provides additional protection to your printer from damage
  * and fire. Marlin always includes safe min and max temperature ranges which
@@ -107,6 +114,13 @@
    */
   #define WATCH_BED_TEMP_PERIOD 60                // Seconds
   #define WATCH_BED_TEMP_INCREASE 2               // Degrees Celsius
+#endif
+
+#if ENABLED(THERMAL_PROTECTION_CHAMBER)
+  #define THERMAL_PROTECTION_CHAMBER_PERIOD 120    // Seconds
+  #define THERMAL_PROTECTION_CHAMBER_HYSTERESIS 20 // Degrees Celsius
+  #define WATCH_CHAMBER_TEMP_PERIOD 60             // Seconds
+  #define WATCH_CHAMBER_TEMP_INCREASE 2            // Degrees Celsius
 #endif
 
 #if ENABLED(PIDTEMP)

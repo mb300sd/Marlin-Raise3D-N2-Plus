@@ -331,7 +331,7 @@
 #define TEMP_SENSOR_3 0
 #define TEMP_SENSOR_4 0
 #define TEMP_SENSOR_BED 11
-#define TEMP_SENSOR_CHAMBER 0
+#define TEMP_SENSOR_CHAMBER 4
 
 // Dummy thermistor constant temperature readings, for use with 998 and 999
 #define DUMMY_THERMISTOR_998_VALUE 25
@@ -352,6 +352,12 @@
 #define TEMP_BED_HYSTERESIS 3       // (degC) range of +/- temperatures considered "close" to the target one
 #define TEMP_BED_WINDOW     1       // (degC) Window around target to start the residency timer x degC early.
 
+// Chamber temperature must be close to target for this long before M190 returns success
+#define TEMP_CHAMBER_RESIDENCY_TIME 10  // (seconds)
+#define TEMP_CHAMBER_HYSTERESIS 15       // (degC) range of +/- temperatures considered "close" to the target one
+#define TEMP_CHAMBER_WINDOW     1       // (degC) Window around target to start the residency timer x degC early.
+
+
 // The minimal temperature defines the temperature below which the heater will not be enabled It is used
 // to check that the wiring to the thermistor is not broken.
 // Otherwise this would lead to the heater being powered on all the time.
@@ -361,6 +367,7 @@
 #define HEATER_3_MINTEMP 5
 #define HEATER_4_MINTEMP 5
 #define BED_MINTEMP 5
+#define CHAMBER_MINTEMP 5
 
 // When temperature exceeds max temp, your heater will be switched off.
 // This feature exists to protect your hotend from overheating accidentally, but *NOT* from thermistor short/failure!
@@ -371,6 +378,7 @@
 #define HEATER_3_MAXTEMP 500
 #define HEATER_4_MAXTEMP 500
 #define BED_MAXTEMP 250
+#define CHAMBER_MAXTEMP 120
 
 //===========================================================================
 //============================= PID Settings ================================
@@ -486,6 +494,25 @@
   // FIND YOUR OWN: "M303 E-1 C8 S90" to run autotune on the bed at 90 degreesC for 8 cycles.
 #endif // PIDTEMPBED
 
+/*
+ * Chamber settings same as above for bed
+ */
+
+//#define PIDTEMPCHAMBER
+
+//#define CHAMBER_LIMIT_SWITCHING
+#define MAX_CHAMBER_POWER 255 // limits duty cycle to bed; 255=full current
+#if ENABLED(PIDTEMPCHAMBER)
+
+  //#define PID_CHAMBER_DEBUG // Sends debug data to the serial port.
+
+  #define  DEFAULT_chamberKp 10.00
+  #define  DEFAULT_chamberKi .023
+  #define  DEFAULT_chamberKd 305.4
+
+  // FIND YOUR OWN: "M303 E-2 C8 S90" to run autotune on the bed at 90 degreesC for 8 cycles.
+#endif // PIDTEMPCHAMBER
+
 // @section extruder
 
 /**
@@ -524,6 +551,7 @@
 
 #define THERMAL_PROTECTION_HOTENDS // Enable thermal protection for all extruders
 #define THERMAL_PROTECTION_BED     // Enable thermal protection for the heated bed
+#define THERMAL_PROTECTION_CHAMBER     // Enable thermal protection for the chamber
 
 //===========================================================================
 //============================= Mechanical Settings =========================

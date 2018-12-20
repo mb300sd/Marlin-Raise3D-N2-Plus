@@ -8499,6 +8499,40 @@ inline void gcode_M109() {
 
 #endif // HAS_HEATED_BED
 
+#if HAS_HEATED_CHAMBER
+  /**
+   * M140: Set chamber temperature
+   */
+  inline void gcode_M141() {
+    if (DEBUGGING(DRYRUN)) return;
+    if (parser.seenval('S')) thermalManager.setTargetChamber(parser.value_celsius());
+  }
+  /**
+   * M191: Sxxx Wait for chamber current temp to reach target temp. Waits only when heating
+   *       Rxxx Wait for chamber current temp to reach target temp. Waits when heating and cooling
+   */
+/*
+ void GcodeSuite::M191() {
+   if (DEBUGGING(DRYRUN)) return;
+
+   const bool no_wait_for_cooling = parser.seenval('S');
+   if (no_wait_for_cooling || parser.seenval('R')) {
+     thermalManager.setTargetBed(parser.value_celsius());
+     #if ENABLED(PRINTJOB_TIMER_AUTOSTART)
+       if (parser.value_celsius() > BED_MINTEMP)
+         print_job_timer.start();
+     #endif
+   }
+   else return;
+ 
+   lcd_setstatusPGM(thermalManager.isHeatingBed() ? PSTR(MSG_BED_HEATING) : PSTR(MSG_BED_COOLING));
+ 
+   thermalManager.wait_for_bed(no_wait_for_cooling);
+ }
+*/
+#endif
+
+
 /**
  * M110: Set Current Line Number
  */
@@ -12503,6 +12537,11 @@ void process_parsed_command() {
       #if HAS_HEATED_BED
         case 140: gcode_M140(); break;                            // M140: Set Bed Temperature
         case 190: gcode_M190(); break;                            // M190: Set Bed Temperature. Wait for target.
+      #endif
+
+      #if HAS_HEATED_CHAMBER
+        case 141: gcode_M141(); break;
+        //case 191: gcode_M191(); break;
       #endif
 
       #if FAN_COUNT > 0
