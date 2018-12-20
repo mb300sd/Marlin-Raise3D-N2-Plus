@@ -346,7 +346,11 @@ uint8_t Temperature::soft_pwm_amount[HOTENDS];
               SERIAL_ECHOPAIR(MSG_BIAS, bias);
               SERIAL_ECHOPAIR(MSG_D, d);
               SERIAL_ECHOPAIR(MSG_T_MIN, min);
-              SERIAL_ECHOPAIR(MSG_T_MAX, max);
+              #ifdef N_SERIES_PROTOCOL
+                SERIAL_ECHOLNPAIR(MSG_T_MAX, max);
+              #else
+                SERIAL_ECHOPAIR(MSG_T_MAX, max);
+              #endif
               if (cycles > 2) {
                 float Ku = (4.0f * d) / (float(M_PI) * (max - min) * 0.5f),
                       Tu = ((float)(t_low + t_high) * 0.001f);
@@ -356,8 +360,13 @@ uint8_t Temperature::soft_pwm_amount[HOTENDS];
                 tune_pid.Ki = 2 * tune_pid.Kp / Tu;
                 tune_pid.Kd = tune_pid.Kp * Tu * 0.125f;
                 SERIAL_ECHOLNPGM("\n" MSG_CLASSIC_PID);
-                SERIAL_ECHOPAIR(MSG_KP, tune_pid.Kp);
-                SERIAL_ECHOPAIR(MSG_KI, tune_pid.Ki);
+                #ifdef N_SERIES_PROTOCOL
+                  SERIAL_ECHOLNPAIR(MSG_KP, tune_pid.Kp);
+                  SERIAL_ECHOLNPAIR(MSG_KI, tune_pid.Ki);
+                #else
+                  SERIAL_ECHOPAIR(MSG_KP, tune_pid.Kp);
+                  SERIAL_ECHOPAIR(MSG_KI, tune_pid.Ki);
+                #endif
                 SERIAL_ECHOLNPAIR(MSG_KD, tune_pid.Kd);
                 /**
                 tune_pid.Kp = 0.33*Ku;
@@ -396,7 +405,12 @@ uint8_t Temperature::soft_pwm_amount[HOTENDS];
       // Report heater states every 2 seconds
       if (ELAPSED(ms, next_temp_ms)) {
         #if HAS_TEMP_SENSOR
-          print_heater_states(heater >= 0 ? heater : active_extruder);
+          #ifdef N_SERIES_PROTOCOL
+            SERIAL_ECHOPAIR("ok T:", current);
+            SERIAL_ECHOPAIR(MSG_AT, soft_pwm_amount);
+          #else
+            print_heater_states(heater >= 0 ? heater : active_extruder);
+          #endif
           SERIAL_EOL();
         #endif
         next_temp_ms = ms + 2000UL;
@@ -2526,13 +2540,46 @@ void Temperature::isr() {
         now = millis();
         if (ELAPSED(now, next_temp_ms)) { // Print temp & remaining time every 1s while waiting
           next_temp_ms = now + 1000UL;
-          print_heater_states(target_extruder);
+         #ifdef N_SERIES_PROTOCOL
+            SERIAL_ECHOPGM("T:");
+            SERIAL_ECHO_F(thermalManager.degHotend(target_extruder),1);
+            SERIAL_ECHOPGM(" E:");
+            SERIAL_ECHO((int)target_extruder);
+          #else
+            print_heater_states(target_extruder);
+          #endif
           #if TEMP_RESIDENCY_TIME > 0
             SERIAL_ECHOPGM(" W:");
             if (residency_start_ms)
               SERIAL_ECHO(long((((TEMP_RESIDENCY_TIME) * 1000UL) - (now - residency_start_ms)) / 1000UL));
             else
               SERIAL_CHAR('?');
+          #endif
+
+          #ifdef N_SERIES_PROTOCOL
+            SERIAL_ECHOPGM(" D:");
+            SERIAL_ECHO_F((double)thermalManager.degTargetHotend(target_extruder),1);
+            SERIAL_ECHOPGM(" B:");
+            SERIAL_ECHO_F(thermalManager.degBed(), 1);
+            SERIAL_ECHOPGM(" /");
+            SERIAL_ECHO_F((double)thermalManager.degTargetBed(), 1);
+            HOTEND_LOOP() {
+            //for (int8_t e = 0; e < 2; e++) { /* always print for 2 even if not DUAL */
+              SERIAL_ECHOPGM(" T");
+              SERIAL_ECHO(e);
+              SERIAL_ECHOPGM(":");
+              SERIAL_ECHO_F(thermalManager.degHotend(e), 1);
+              SERIAL_ECHOPGM(" /");
+              SERIAL_ECHO_F((double)thermalManager.degTargetHotend(e), 1);
+              SERIAL_ECHOPGM(" F");
+              SERIAL_CHAR('0' + e);
+              SERIAL_CHAR(':');
+              SERIAL_ECHO(planner.flow_percentage[e]);
+            }
+            SERIAL_ECHOPGM(" S:");
+            SERIAL_ECHO(fan_speed[0]);
+            SERIAL_ECHOPGM(" P:");
+            SERIAL_ECHO(feedrate_percentage);
           #endif
           SERIAL_EOL();
         }
@@ -2649,7 +2696,40 @@ void Temperature::isr() {
         now = millis();
         if (ELAPSED(now, next_temp_ms)) { //Print Temp Reading every 1 second while heating up.
           next_temp_ms = now + 1000UL;
-          print_heater_states(active_extruder);
+          #ifdef N_SERIES_PROTOCOL
+            SERIAL_ECHOPGM("T:");
+            SERIAL_ECHO_F(thermalManager.degHotend(active_extruder),1);
+            SERIAL_ECHOPGM(" E:");
+            SERIAL_ECHO((int)active_extruder);
+            SERIAL_ECHOPGM(" B:");
+            SERIAL_ECHO_F(thermalManager.degBed(),1);
+            SERIAL_ECHOPGM(" D:");
+            SERIAL_ECHO_F((double)thermalManager.degTargetBed(),1);
+            SERIAL_ECHOPGM(" B:");
+            SERIAL_ECHO_F(thermalManager.degBed(), 1);
+            SERIAL_ECHOPGM(" /");
+            SERIAL_ECHO_F((double)thermalManager.degTargetBed(), 1);
+            HOTEND_LOOP() {
+            //for (int8_t e = 0; e < 2; e++) { /* always print for 2 even if not DUAL */
+              SERIAL_ECHOPGM(" T");
+              SERIAL_ECHO(e);
+              SERIAL_ECHOPGM(":");
+              SERIAL_ECHO_F(thermalManager.degHotend(e), 1);
+              SERIAL_ECHOPGM(" /");
+              SERIAL_ECHO_F((double)thermalManager.degTargetHotend(e), 1);
+              SERIAL_ECHOPGM(" F");
+              SERIAL_CHAR('0' + e);
+              SERIAL_CHAR(':');
+              SERIAL_ECHO(planner.flow_percentage[e]);
+            }
+            SERIAL_ECHOPGM(" S:");
+            SERIAL_ECHO(fan_speed[0]);
+            SERIAL_ECHOPGM(" P:");
+            SERIAL_ECHO(feedrate_percentage);
+          #else
+            print_heater_states(active_extruder);
+          #endif
+
           #if TEMP_BED_RESIDENCY_TIME > 0
             SERIAL_ECHOPGM(" W:");
             if (residency_start_ms)

@@ -233,6 +233,14 @@ void ok_to_send() {
     SERIAL_ECHOPGM_P(port, " P"); SERIAL_ECHO_P(port, int(BLOCK_BUFFER_SIZE - planner.movesplanned() - 1));
     SERIAL_ECHOPGM_P(port, " B"); SERIAL_ECHO_P(port, BUFSIZE - commands_in_queue);
   #endif
+  #ifdef N_SERIES_PROTOCOL
+    SERIAL_ECHO_P(port, ':');
+    if (planner.block_buffer_tail == planner.block_buffer_head) {
+      SERIAL_ECHO_P(port, 0);
+    } else {
+      SERIAL_ECHO_P(port, (planner.block_buffer_head - planner.block_buffer_tail + BLOCK_BUFFER_SIZE)%BLOCK_BUFFER_SIZE);
+    }
+  #endif
   SERIAL_EOL_P(port);
 }
 

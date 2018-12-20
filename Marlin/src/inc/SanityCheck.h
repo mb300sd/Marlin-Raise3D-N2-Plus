@@ -21,6 +21,8 @@
  */
 #pragma once
 
+#define static_assert(x,y)
+
 /**
  * SanityCheck.h
  *

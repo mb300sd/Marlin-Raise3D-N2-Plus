@@ -34,6 +34,14 @@ void GcodeSuite::M221() {
   if (parser.seenval('S')) {
     planner.flow_percentage[target_extruder] = parser.value_int();
     planner.refresh_e_factor(target_extruder);
+    #ifdef N_SERIES_PROTOCOL
+      /* Strange response here for Raise3D */
+      SERIAL_ECHOLN(planner.flow_percentage[target_extruder]);
+      SERIAL_ECHOLN(target_extruder);
+      SERIAL_ECHOLN(planner.flow_percentage[0]);
+      SERIAL_ECHOLN(planner.flow_percentage[1]);
+    #endif
+
   }
   else {
     SERIAL_ECHO_START();

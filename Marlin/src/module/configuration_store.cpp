@@ -2245,83 +2245,85 @@ void MarlinSettings::reset(PORTARG_SOLO) {
     /**
      * Announce current units, in case inches are being displayed
      */
-    CONFIG_ECHO_START();
-    #if ENABLED(INCH_MODE_SUPPORT)
-      SERIAL_ECHOPGM_P(port, "  G2");
-      SERIAL_CHAR_P(port, parser.linear_unit_factor == 1.0 ? '1' : '0');
-      SERIAL_ECHOPGM_P(port, " ;");
-      SAY_UNITS_P(port, false);
-    #else
-      SERIAL_ECHOPGM_P(port, "  G21    ; Units in mm");
-      SAY_UNITS_P(port, false);
-    #endif
-    SERIAL_EOL_P(port);
-
-    #if HAS_LCD_MENU
-
-      // Temperature units - for Ultipanel temperature options
-
+    #ifndef N_SERIES_PROTOCOL
       CONFIG_ECHO_START();
-      #if ENABLED(TEMPERATURE_UNITS_SUPPORT)
-        SERIAL_ECHOPGM_P(port, "  M149 ");
-        SERIAL_CHAR_P(port, parser.temp_units_code());
-        SERIAL_ECHOPGM_P(port, " ; Units in ");
-        serialprintPGM_P(port, parser.temp_units_name());
+      #if ENABLED(INCH_MODE_SUPPORT)
+        SERIAL_ECHOPGM_P(port, "  G2");
+        SERIAL_CHAR_P(port, parser.linear_unit_factor == 1.0 ? '1' : '0');
+        SERIAL_ECHOPGM_P(port, " ;");
+        SAY_UNITS_P(port, false);
       #else
-        SERIAL_ECHOLNPGM_P(port, "  M149 C ; Units in Celsius");
+        SERIAL_ECHOPGM_P(port, "  G21    ; Units in mm");
+        SAY_UNITS_P(port, false);
+      #endif
+      SERIAL_EOL_P(port);
+
+      #if HAS_LCD_MENU
+
+        // Temperature units - for Ultipanel temperature options
+
+        CONFIG_ECHO_START();
+        #if ENABLED(TEMPERATURE_UNITS_SUPPORT)
+          SERIAL_ECHOPGM_P(port, "  M149 ");
+          SERIAL_CHAR_P(port, parser.temp_units_code());
+          SERIAL_ECHOPGM_P(port, " ; Units in ");
+          serialprintPGM_P(port, parser.temp_units_name());
+        #else
+          SERIAL_ECHOLNPGM_P(port, "  M149 C ; Units in Celsius");
+        #endif
+
       #endif
 
-    #endif
-
-    SERIAL_EOL_P(port);
-
-    #if DISABLED(NO_VOLUMETRICS)
-
-      /**
-       * Volumetric extrusion M200
-       */
-      if (!forReplay) {
-        CONFIG_ECHO_START();
-        SERIAL_ECHOPGM_P(port, "Filament settings:");
-        if (parser.volumetric_enabled)
-          SERIAL_EOL_P(port);
-        else
-          SERIAL_ECHOLNPGM_P(port, " Disabled");
-      }
-
-      CONFIG_ECHO_START();
-      SERIAL_ECHOPAIR_P(port, "  M200 D", LINEAR_UNIT(planner.filament_size[0]));
       SERIAL_EOL_P(port);
-      #if EXTRUDERS > 1
-        CONFIG_ECHO_START();
-        SERIAL_ECHOPAIR_P(port, "  M200 T1 D", LINEAR_UNIT(planner.filament_size[1]));
-        SERIAL_EOL_P(port);
-        #if EXTRUDERS > 2
+
+      #if DISABLED(NO_VOLUMETRICS)
+
+        /**
+         * Volumetric extrusion M200
+         */
+        if (!forReplay) {
           CONFIG_ECHO_START();
-          SERIAL_ECHOPAIR_P(port, "  M200 T2 D", LINEAR_UNIT(planner.filament_size[2]));
-          SERIAL_EOL_P(port);
-          #if EXTRUDERS > 3
-            CONFIG_ECHO_START();
-            SERIAL_ECHOPAIR_P(port, "  M200 T3 D", LINEAR_UNIT(planner.filament_size[3]));
+          SERIAL_ECHOPGM_P(port, "Filament settings:");
+          if (parser.volumetric_enabled)
             SERIAL_EOL_P(port);
-            #if EXTRUDERS > 4
+          else
+            SERIAL_ECHOLNPGM_P(port, " Disabled");
+        }
+
+        CONFIG_ECHO_START();
+        SERIAL_ECHOPAIR_P(port, "  M200 D", LINEAR_UNIT(planner.filament_size[0]));
+        SERIAL_EOL_P(port);
+        #if EXTRUDERS > 1
+          CONFIG_ECHO_START();
+          SERIAL_ECHOPAIR_P(port, "  M200 T1 D", LINEAR_UNIT(planner.filament_size[1]));
+          SERIAL_EOL_P(port);
+          #if EXTRUDERS > 2
+            CONFIG_ECHO_START();
+            SERIAL_ECHOPAIR_P(port, "  M200 T2 D", LINEAR_UNIT(planner.filament_size[2]));
+            SERIAL_EOL_P(port);
+            #if EXTRUDERS > 3
               CONFIG_ECHO_START();
-              SERIAL_ECHOPAIR_P(port, "  M200 T4 D", LINEAR_UNIT(planner.filament_size[4]));
+              SERIAL_ECHOPAIR_P(port, "  M200 T3 D", LINEAR_UNIT(planner.filament_size[3]));
               SERIAL_EOL_P(port);
-              #if EXTRUDERS > 5
+              #if EXTRUDERS > 4
                 CONFIG_ECHO_START();
-                SERIAL_ECHOPAIR_P(port, "  M200 T5 D", LINEAR_UNIT(planner.filament_size[5]));
+                SERIAL_ECHOPAIR_P(port, "  M200 T4 D", LINEAR_UNIT(planner.filament_size[4]));
                 SERIAL_EOL_P(port);
-              #endif // EXTRUDERS > 5
-            #endif // EXTRUDERS > 4
-          #endif // EXTRUDERS > 3
-        #endif // EXTRUDERS > 2
-      #endif // EXTRUDERS > 1
+                #if EXTRUDERS > 5
+                  CONFIG_ECHO_START();
+                  SERIAL_ECHOPAIR_P(port, "  M200 T5 D", LINEAR_UNIT(planner.filament_size[5]));
+                  SERIAL_EOL_P(port);
+                #endif // EXTRUDERS > 5
+              #endif // EXTRUDERS > 4
+            #endif // EXTRUDERS > 3
+          #endif // EXTRUDERS > 2
+        #endif // EXTRUDERS > 1
 
-      if (!parser.volumetric_enabled)
-        CONFIG_ECHO_MSG("  M200 D0");
+        if (!parser.volumetric_enabled)
+          CONFIG_ECHO_MSG("  M200 D0");
 
-    #endif // !NO_VOLUMETRICS
+      #endif // !NO_VOLUMETRICS
+    #endif // N_SERIES_PROTOCOL
 
     CONFIG_ECHO_HEADING("Steps per unit:");
     CONFIG_ECHO_START();
@@ -2339,8 +2341,11 @@ void MarlinSettings::reset(PORTARG_SOLO) {
         SERIAL_ECHOLNPAIR_P(port, " E", VOLUMETRIC_UNIT(planner.settings.axis_steps_per_mm[E_AXIS + i]));
       }
     #endif
-
-    CONFIG_ECHO_HEADING("Maximum feedrates (units/s):");
+    #ifdef N_SERIES_PROTOCOL
+      CONFIG_ECHO_HEADING("Maximum feedrates (mm/s):");
+    #else
+      CONFIG_ECHO_HEADING("Maximum feedrates (units/s):");
+    #endif
     CONFIG_ECHO_START();
     SERIAL_ECHOPAIR_P(port, "  M203 X", LINEAR_UNIT(planner.settings.max_feedrate_mm_s[X_AXIS]));
     SERIAL_ECHOPAIR_P(port, " Y", LINEAR_UNIT(planner.settings.max_feedrate_mm_s[Y_AXIS]));
@@ -2357,7 +2362,11 @@ void MarlinSettings::reset(PORTARG_SOLO) {
       }
     #endif
 
-    CONFIG_ECHO_HEADING("Maximum Acceleration (units/s2):");
+    #ifdef N_SERIES_PROTOCOL
+      CONFIG_ECHO_HEADING("Maximum Acceleration (mm/s2):");
+    #else
+      CONFIG_ECHO_HEADING("Maximum Acceleration (units/s2):");
+    #endif
     CONFIG_ECHO_START();
     SERIAL_ECHOPAIR_P(port, "  M201 X", LINEAR_UNIT(planner.settings.max_acceleration_mm_per_s2[X_AXIS]));
     SERIAL_ECHOPAIR_P(port, " Y", LINEAR_UNIT(planner.settings.max_acceleration_mm_per_s2[Y_AXIS]));
@@ -2373,48 +2382,78 @@ void MarlinSettings::reset(PORTARG_SOLO) {
         SERIAL_ECHOLNPAIR_P(port, " E", VOLUMETRIC_UNIT(planner.settings.max_acceleration_mm_per_s2[E_AXIS + i]));
       }
     #endif
-
-    CONFIG_ECHO_HEADING("Acceleration (units/s2): P<print_accel> R<retract_accel> T<travel_accel>");
+    #ifdef N_SERIES_PROTOCOL
+      CONFIG_ECHO_HEADING("Accelerations: P=printing, R=retract and T=travel");
+    #else
+      CONFIG_ECHO_HEADING("Acceleration (units/s2): P<print_accel> R<retract_accel> T<travel_accel>");
+    #endif
     CONFIG_ECHO_START();
     SERIAL_ECHOPAIR_P(port, "  M204 P", LINEAR_UNIT(planner.settings.acceleration));
     SERIAL_ECHOPAIR_P(port, " R", LINEAR_UNIT(planner.settings.retract_acceleration));
     SERIAL_ECHOLNPAIR_P(port, " T", LINEAR_UNIT(planner.settings.travel_acceleration));
 
-    if (!forReplay) {
+
+    #ifdef N_SERIES_PROTOCOL
+      if (!forReplay) {
+        CONFIG_ECHO_START();
+        SERIAL_ECHOPGM_P(port, "Advanced variables: S=Min feedrate (mm/s), T=Min travel feedrate (mm/s), B=minimum segment time (ms), X=maximum XY jerk (mm/s),  Z=maximum Z jerk (mm/s),  E=maximum E jerk (mm/s)");
+        SERIAL_EOL_P(port);
+      }
       CONFIG_ECHO_START();
-      SERIAL_ECHOPGM_P(port, "Advanced: B<min_segment_time_us> S<min_feedrate> T<min_travel_feedrate>");
+      SERIAL_ECHOPAIR_P(port, "  M205 S", LINEAR_UNIT(planner.settings.min_feedrate_mm_s));
+      SERIAL_ECHOPAIR_P(port, " T", LINEAR_UNIT(planner.settings.min_travel_feedrate_mm_s));
+      SERIAL_ECHOPAIR_P(port, " B", LINEAR_UNIT(planner.settings.min_segment_time_us));
+
+      #if HAS_CLASSIC_JERK
+        SERIAL_ECHOPAIR_P(port, " X", LINEAR_UNIT(planner.max_jerk[X_AXIS]));
+        SERIAL_ECHOPAIR_P(port, " Z", LINEAR_UNIT(planner.max_jerk[Z_AXIS]));
+        SERIAL_ECHOPAIR_P(port, " E", LINEAR_UNIT(planner.max_jerk[E_AXIS]));
+      #else
+        SERIAL_ECHOPAIR_P(port, " X", LINEAR_UNIT(0));
+        SERIAL_ECHOPAIR_P(port, " Z", LINEAR_UNIT(0));
+        SERIAL_ECHOPAIR_P(port, " E", LINEAR_UNIT(0));
+      #endif
+    #else
+      if (!forReplay) {
+        CONFIG_ECHO_START();
+        SERIAL_ECHOPGM_P(port, "Advanced: B<min_segment_time_us> S<min_feedrate> T<min_travel_feedrate>");
+        #if ENABLED(JUNCTION_DEVIATION)
+          SERIAL_ECHOPGM_P(port, " J<junc_dev>");
+        #endif
+        #if HAS_CLASSIC_JERK
+          SERIAL_ECHOPGM_P(port, " X<max_x_jerk> Y<max_y_jerk> Z<max_z_jerk>");
+          #if DISABLED(JUNCTION_DEVIATION) || DISABLED(LIN_ADVANCE)
+            SERIAL_ECHOPGM_P(port, " E<max_e_jerk>");
+          #endif
+        #endif
+        SERIAL_EOL_P(port);
+      }
+      CONFIG_ECHO_START();
+      SERIAL_ECHOPAIR_P(port, "  M205 B", LINEAR_UNIT(planner.settings.min_segment_time_us));
+      SERIAL_ECHOPAIR_P(port, " S", LINEAR_UNIT(planner.settings.min_feedrate_mm_s));
+      SERIAL_ECHOPAIR_P(port, " T", LINEAR_UNIT(planner.settings.min_travel_feedrate_mm_s));
+
       #if ENABLED(JUNCTION_DEVIATION)
-        SERIAL_ECHOPGM_P(port, " J<junc_dev>");
+        SERIAL_ECHOPAIR_P(port, " J", LINEAR_UNIT(planner.junction_deviation_mm));
       #endif
       #if HAS_CLASSIC_JERK
-        SERIAL_ECHOPGM_P(port, " X<max_x_jerk> Y<max_y_jerk> Z<max_z_jerk>");
+        SERIAL_ECHOPAIR_P(port, " X", LINEAR_UNIT(planner.max_jerk[X_AXIS]));
+        SERIAL_ECHOPAIR_P(port, " Y", LINEAR_UNIT(planner.max_jerk[Y_AXIS]));
+        SERIAL_ECHOPAIR_P(port, " Z", LINEAR_UNIT(planner.max_jerk[Z_AXIS]));
         #if DISABLED(JUNCTION_DEVIATION) || DISABLED(LIN_ADVANCE)
-          SERIAL_ECHOPGM_P(port, " E<max_e_jerk>");
+          SERIAL_ECHOPAIR_P(port, " E", LINEAR_UNIT(planner.max_jerk[E_AXIS]));
         #endif
-      #endif
-      SERIAL_EOL_P(port);
-    }
-    CONFIG_ECHO_START();
-    SERIAL_ECHOPAIR_P(port, "  M205 B", LINEAR_UNIT(planner.settings.min_segment_time_us));
-    SERIAL_ECHOPAIR_P(port, " S", LINEAR_UNIT(planner.settings.min_feedrate_mm_s));
-    SERIAL_ECHOPAIR_P(port, " T", LINEAR_UNIT(planner.settings.min_travel_feedrate_mm_s));
-
-    #if ENABLED(JUNCTION_DEVIATION)
-      SERIAL_ECHOPAIR_P(port, " J", LINEAR_UNIT(planner.junction_deviation_mm));
-    #endif
-    #if HAS_CLASSIC_JERK
-      SERIAL_ECHOPAIR_P(port, " X", LINEAR_UNIT(planner.max_jerk[X_AXIS]));
-      SERIAL_ECHOPAIR_P(port, " Y", LINEAR_UNIT(planner.max_jerk[Y_AXIS]));
-      SERIAL_ECHOPAIR_P(port, " Z", LINEAR_UNIT(planner.max_jerk[Z_AXIS]));
-      #if DISABLED(JUNCTION_DEVIATION) || DISABLED(LIN_ADVANCE)
-        SERIAL_ECHOPAIR_P(port, " E", LINEAR_UNIT(planner.max_jerk[E_AXIS]));
       #endif
     #endif
 
     SERIAL_EOL_P(port);
 
     #if HAS_M206_COMMAND
-      CONFIG_ECHO_HEADING("Home offset:");
+      #ifdef N_SERIES_PROTOCOL
+        CONFIG_ECHO_HEADING("Home offset (mm):");
+      #else
+        CONFIG_ECHO_HEADING("Home offset:");
+      #endif
       CONFIG_ECHO_START();
       SERIAL_ECHOPAIR_P(port, "  M206 X", LINEAR_UNIT(home_offset[X_AXIS]));
       SERIAL_ECHOPAIR_P(port, " Y", LINEAR_UNIT(home_offset[Y_AXIS]));
@@ -2582,17 +2621,19 @@ void MarlinSettings::reset(PORTARG_SOLO) {
 
     #endif // [XYZ]_DUAL_ENDSTOPS
 
-    #if HAS_LCD_MENU
+    #ifndef N_SERIES_PROTOCOL
+      #if HAS_LCD_MENU
 
-      CONFIG_ECHO_HEADING("Material heatup parameters:");
-      for (uint8_t i = 0; i < COUNT(ui.preheat_hotend_temp); i++) {
-        CONFIG_ECHO_START();
-        SERIAL_ECHOPAIR_P(port, "  M145 S", (int)i);
-        SERIAL_ECHOPAIR_P(port, " H", TEMP_UNIT(ui.preheat_hotend_temp[i]));
-        SERIAL_ECHOPAIR_P(port, " B", TEMP_UNIT(ui.preheat_bed_temp[i]));
-        SERIAL_ECHOLNPAIR_P(port, " F", int(ui.preheat_fan_speed[i]));
-      }
+        CONFIG_ECHO_HEADING("Material heatup parameters:");
+        for (uint8_t i = 0; i < COUNT(ui.preheat_hotend_temp); i++) {
+          CONFIG_ECHO_START();
+          SERIAL_ECHOPAIR_P(port, "  M145 S", (int)i);
+          SERIAL_ECHOPAIR_P(port, " H", TEMP_UNIT(ui.preheat_hotend_temp[i]));
+          SERIAL_ECHOPAIR_P(port, " B", TEMP_UNIT(ui.preheat_bed_temp[i]));
+          SERIAL_ECHOLNPAIR_P(port, " F", int(ui.preheat_fan_speed[i]));
+        }
 
+      #endif
     #endif
 
     #if HAS_PID_HEATING
@@ -2646,10 +2687,12 @@ void MarlinSettings::reset(PORTARG_SOLO) {
       SERIAL_ECHOLNPAIR_P(port, "  M250 C", ui.contrast);
     #endif
 
-    #if ENABLED(POWER_LOSS_RECOVERY)
-      CONFIG_ECHO_HEADING("Power-Loss Recovery:");
-      CONFIG_ECHO_START();
-      SERIAL_ECHOLNPAIR_P(port, "  M413 S", int(recovery.enabled));
+    #ifndef N_SERIES_PROTOCOL
+      #if ENABLED(POWER_LOSS_RECOVERY)
+        CONFIG_ECHO_HEADING("Power-Loss Recovery:");
+        CONFIG_ECHO_START();
+        SERIAL_ECHOLNPAIR_P(port, "  M413 S", int(recovery.enabled));
+      #endif
     #endif
 
     #if ENABLED(FWRETRACT)
@@ -2677,17 +2720,35 @@ void MarlinSettings::reset(PORTARG_SOLO) {
 
     #endif // FWRETRACT
 
+    #ifdef N_SERIES_PROTOCOL
+      /**
+       * Volumetric extrusion M200
+       */
+      if (!forReplay) {
+        CONFIG_ECHO_START();
+        CONFIG_ECHO_HEADING("Filament settings:");
+        if (parser.volumetric_enabled)
+          SERIAL_EOL_P(port);
+        else
+          SERIAL_ECHOLNPGM_P(port," Disabled");
+      }
+     #endif
+
     /**
      * Probe Offset
      */
-    #if HAS_BED_PROBE
+    #if HAS_BED_PROBE || ENABLED(N_SERIES_PROTOCOL)
       if (!forReplay) {
         CONFIG_ECHO_START();
         SERIAL_ECHOPGM_P(port, "Z-Probe Offset");
         SAY_UNITS_P(port, true);
       }
       CONFIG_ECHO_START();
-      SERIAL_ECHOLNPAIR_P(port, "  M851 Z", LINEAR_UNIT(zprobe_zoffset));
+      #if ENABLED(N_SERIES_PROTOCOL)
+        SERIAL_ECHOLNPGM_P(port," M851 Z0.00");
+      #else
+        SERIAL_ECHOLNPAIR_P(port, "  M851 Z", LINEAR_UNIT(zprobe_zoffset));
+      #endif
     #endif
 
     /**

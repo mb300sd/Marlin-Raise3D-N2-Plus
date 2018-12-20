@@ -22,6 +22,7 @@
 
 #include "../gcode.h"
 #include "../../module/temperature.h"
+#include "../../module/planner.h"
 
 #if NUM_SERIAL > 1
   #include "../../gcode/queue.h"
@@ -41,11 +42,39 @@ void GcodeSuite::M105() {
 
   #if HAS_TEMP_SENSOR
     SERIAL_ECHOPGM_P(port, MSG_OK);
-    thermalManager.print_heater_states(target_extruder
-      #if NUM_SERIAL > 1
-        , port
-      #endif
-    );
+      #ifdef N_SERIES_PROTOCOL
+        SERIAL_ECHOPGM_P(port, " T:");
+        SERIAL_ECHO_F_P(port, thermalManager.degHotend(target_extruder), 1);
+        SERIAL_ECHOPGM_P(port, " /");
+        SERIAL_ECHO_F_P(port, (double)thermalManager.degTargetHotend(target_extruder), 1);
+        SERIAL_ECHOPGM_P(port, " B:");
+        SERIAL_ECHO_F_P(port, thermalManager.degBed(), 1);
+        SERIAL_ECHOPGM_P(port, " /");
+        SERIAL_ECHO_F_P(port, (double)thermalManager.degTargetBed(), 1);
+        HOTEND_LOOP() {
+        //for (int8_t e = 0; e < 2; e++) { /* always print for 2 even if not DUAL */
+        SERIAL_ECHOPGM_P(port, " T");
+        SERIAL_ECHO_P(port, e);
+        SERIAL_ECHOPGM_P(port, ":");
+        SERIAL_ECHO_F_P(port, thermalManager.degHotend(e), 1);
+        SERIAL_ECHOPGM_P(port, " /");
+        SERIAL_ECHO_F_P(port, (double)thermalManager.degTargetHotend(e), 1);
+        SERIAL_ECHOPGM_P(port, " F");
+        SERIAL_CHAR_P(port, '0' + e);
+        SERIAL_CHAR_P(port, ':');
+        SERIAL_ECHO_P(port, planner.flow_percentage[e]);
+      }
+      SERIAL_ECHOPGM_P(port, " S:");
+      SERIAL_ECHO_P(port, fan_speed[0]);
+      SERIAL_ECHOPGM_P(port, " P:");
+      SERIAL_ECHO_P(port, feedrate_percentage);
+    #else
+      thermalManager.print_heater_states(target_extruder
+        #if NUM_SERIAL > 1
+          , port
+        #endif
+      );
+    #endif
   #else // !HAS_TEMP_SENSOR
     SERIAL_ERROR_MSG_P(port, MSG_ERR_NO_THERMISTORS);
   #endif
