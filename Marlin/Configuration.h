@@ -414,9 +414,16 @@
   #else
 
     // N series KS version
-    #define  DEFAULT_Kp 14.49
-    #define  DEFAULT_Ki 0.8
-    #define  DEFAULT_Kd 65.52
+//    #define  DEFAULT_Kp 14.49
+//    #define  DEFAULT_Ki 0.8
+//    #define  DEFAULT_Kd 65.52
+
+// 60W E3Dv6
+    #define  DEFAULT_Kp 14.68
+    #define  DEFAULT_Ki 0.92
+    #define  DEFAULT_Kd 58.46
+
+
 
 //Test V2 hotend
 //   #define  DEFAULT_Kp 10.65
