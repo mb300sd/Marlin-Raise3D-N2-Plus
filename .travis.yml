@@ -1,4 +1,4 @@
-dist: trusty
+dist: bionic
 sudo: true
   #
 language: c
@@ -23,9 +23,9 @@ before_install:
 install:
   #
   # Install arduino 1.8.5
-  - wget http://downloads-02.arduino.cc/arduino-1.8.5-linux64.tar.xz
-  - tar xf arduino-1.8.5-linux64.tar.xz
-  - sudo mv arduino-1.8.5 /usr/local/share/arduino
+  - wget http://downloads.arduino.cc/arduino-1.8.9-linux64.tar.xz
+  - tar xf arduino-1.8.9-linux64.tar.xz
+  - sudo mv arduino-1.8.9 /usr/local/share/arduino
   - ln -s /usr/local/share/arduino/arduino ${TRAVIS_BUILD_DIR}/buildroot/bin/arduino
   #
   # Install: LiquidCrystal_I2C library
@@ -113,7 +113,8 @@ script:
   - opt_set TEMP_SENSOR_BED 1
   - opt_enable AUTO_BED_LEVELING_UBL RESTORE_LEVELING_AFTER_G28 DEBUG_LEVELING_FEATURE G26_MESH_EDITING ENABLE_LEVELING_FADE_HEIGHT SKEW_CORRECTION
   - opt_enable EEPROM_SETTINGS EEPROM_CHITCHAT REPRAP_DISCOUNT_FULL_GRAPHIC_SMART_CONTROLLER
-  - opt_enable_adv CUSTOM_USER_MENUS I2C_POSITION_ENCODERS BABYSTEPPING BABYSTEP_XY LIN_ADVANCE NANODLP_Z_SYNC QUICK_HOME JUNCTION_DEVIATION
+  - opt_enable_adv CUSTOM_USER_MENUS I2C_POSITION_ENCODERS BABYSTEPPING BABYSTEP_XY LIN_ADVANCE NANODLP_Z_SYNC QUICK_HOME JUNCTION_DEVIATION MAX7219_DEBUG
+  - opt_set_adv MAX7219_ROTATE 270
   - build_marlin
   #
   # Add a Sled Z Probe, use UBL Cartesian moves, use Japanese language
@@ -319,11 +320,11 @@ script:
   #
   #- restore_configs
   #- opt_enable REPRAP_DISCOUNT_FULL_GRAPHIC_SMART_CONTROLLER SDSUPPORT
-  #- for lang in an bg ca zh_CN zh_TW cz da de el el-gr en es eu fi fr gl hr it jp-kana nl pl pt pt-br ru sk tr uk test; do opt_set LCD_LANGUAGE $lang; echo "compile with language $lang ..."; build_marlin
+  #- for lang in an bg ca zh_CN zh_TW cz da de el el-gr en es eu fi fr gl hr it jp-kana ko_KR nl pl pt pt-br ru sk tr uk test; do opt_set LCD_LANGUAGE $lang; echo "compile with language $lang ..."; build_marlin
   #
   #- restore_configs
   #- opt_enable REPRAP_DISCOUNT_SMART_CONTROLLER SDSUPPORT
-  #- for lang in an bg ca zh_CN zh_TW cz da de el el-gr en es eu fi fr gl hr it jp-kana nl pl pt pt-br ru sk tr uk test; do opt_set LCD_LANGUAGE $lang; echo "compile with language $lang ..."; build_marlin
+  #- for lang in an bg ca zh_CN zh_TW cz da de el el-gr en es eu fi fr gl hr it jp-kana ko_KR nl pl pt pt-br ru sk tr uk test; do opt_set LCD_LANGUAGE $lang; echo "compile with language $lang ..."; build_marlin
   #
   #
   ######## Example Configurations ##############
