@@ -50,9 +50,9 @@
 #define X_MIN_PIN                             37
 #define X_MAX_PIN                             36
 #define Y_MIN_PIN                             35
-#define Y_MAX_PIN                             34
+#define Y_MAX_PIN                             -1 // Raise3D // 34
 #define Z_MIN_PIN                             33
-#define Z_MAX_PIN                             32
+#define Z_MAX_PIN                             -1 // Raise3D // 32
 
 //
 // Z Probe (when not Z_MIN_PIN)
@@ -89,17 +89,22 @@
 #endif
 
 #if E1_STEP_PIN != 29
-  #define E2_STEP_PIN                         29
-  #define E2_DIR_PIN                          28
-  #define E2_ENABLE_PIN                       39
+  //#define E2_STEP_PIN                        29
+  //#define E2_DIR_PIN                         28
+  //#define E2_ENABLE_PIN                      39
 #endif
+
+#define Z2_STEP_PIN        29   /* Raise3D */
+#define Z2_DIR_PIN         28   /* Raise3D */
+#define Z2_ENABLE_PIN      39   /* Raise3D */
 
 //
 // Temperature Sensors
 //
 #ifndef TEMP_0_PIN
   #if TEMP_SENSOR_0 == -1
-    #define TEMP_0_PIN                         6  // Analog Input (connector *K1* on RUMBA thermocouple ADD ON is used)
+    #define TEMP_0_PIN                        15   /* Raise3D */
+  //#define TEMP_0_PIN                         6  // Analog Input (connector *K1* on RUMBA thermocouple ADD ON is used)
   #else
     #define TEMP_0_PIN                        15  // Analog Input (default connector for thermistor *T0* on rumba board is used)
   #endif
@@ -107,6 +112,7 @@
 
 #ifndef TEMP_1_PIN
   #if TEMP_SENSOR_1 == -1
+    #define TEMP_1_PIN                        14   /* Raise3D */
     #define TEMP_1_PIN                         5  // Analog Input (connector *K2* on RUMBA thermocouple ADD ON is used)
   #else
     #define TEMP_1_PIN                        14  // Analog Input (default connector for thermistor *T1* on rumba board is used)
@@ -127,7 +133,8 @@
 #endif
 
 #if TEMP_SENSOR_BED == -1
-  #define TEMP_BED_PIN                         7  // Analog Input (connector *K3* on RUMBA thermocouple ADD ON is used <-- this can't be used when TEMP_SENSOR_2 is defined as thermocouple)
+  #define TEMP_BED_PIN                        11   /* Raise3D */
+//#define TEMP_BED_PIN                         7  // Analog Input (connector *K3* on RUMBA thermocouple ADD ON is used <-- this can't be used when TEMP_SENSOR_2 is defined as thermocouple)
 #else
   #define TEMP_BED_PIN                        11  // Analog Input (default connector for thermistor *THB* on rumba board is used)
 #endif
@@ -137,12 +144,13 @@
 //
 #define HEATER_0_PIN                           2
 #define HEATER_1_PIN                           3
-#define HEATER_2_PIN                           6
-#define HEATER_3_PIN                           8
+//#define HEATER_2_PIN                         6 //Reusing
+//#define HEATER_3_PIN                         8 //Reusing
 #define HEATER_BED_PIN                         9
+#define HEATER_CHAMBER_PIN 45 //pson header
 
 #ifndef FAN_PIN
-  #define FAN_PIN                              7
+  #define FAN_PIN                              6 // Berd Air //7
 #endif
 #ifndef FAN1_PIN
   #define FAN1_PIN                             8
@@ -152,11 +160,11 @@
 // Misc. Functions
 //
 #define LED_PIN                               13
-#define PS_ON_PIN                             45
+//#define PS_ON_PIN                           45 // Reusing
 #define KILL_PIN                              46
 
 #ifndef CASE_LIGHT_PIN
-  #define CASE_LIGHT_PIN                      45
+//#define CASE_LIGHT_PIN                      45 // Reusing
 #endif
 
 //

@@ -84,7 +84,7 @@
  */
 
 // Show the Marlin bootscreen on startup. ** ENABLE FOR PRODUCTION **
-#define SHOW_BOOTSCREEN
+//#define SHOW_BOOTSCREEN
 
 // Show the bitmap in Marlin/_Bootscreen.h on startup.
 //#define SHOW_CUSTOM_BOOTSCREEN
@@ -111,6 +111,16 @@
  */
 //#define SERIAL_PORT_2 -1
 
+/*=====Raise3D modified======*/
+#define N_SERIES_PROTOCOL
+//#define N1
+//#define N2
+#define N2PLUS
+#define DUAL            //Un-comment this line to get dual head version firmware.
+//#define BONDTECH_MINI   //Un-comment this line to get Bondtech extruder firmware (can be combined with DUAL).
+#define BONDTECH_BMG    //Un-comment this line to get Bondtech BMG extruder firmware (can be combined with DUAL).
+
+
 /**
  * This setting determines the communication speed of the printer.
  *
@@ -120,14 +130,14 @@
  *
  * :[2400, 9600, 19200, 38400, 57600, 115200, 250000, 500000, 1000000]
  */
-#define BAUDRATE 250000
+#define BAUDRATE 230400
 
 // Enable the Bluetooth serial interface on AT90USB devices
 //#define BLUETOOTH
 
 // Choose the name from boards.h that matches your setup
 #ifndef MOTHERBOARD
-  #define MOTHERBOARD BOARD_RAMPS_14_EFB
+  #define MOTHERBOARD BOARD_RUMBA_RAISE3D
 #endif
 
 // Name displayed in the LCD "Ready" message and Info menu
@@ -141,7 +151,11 @@
 
 // This defines the number of extruders
 // :[0, 1, 2, 3, 4, 5, 6, 7, 8]
-#define EXTRUDERS 1
+#ifdef  DUAL
+    #define EXTRUDERS 2
+#else
+    #define EXTRUDERS 1
+#endif
 
 // Generally expected filament diameter (1.75, 2.85, 3.0, ...). Used for Volumetric, Filament Width Sensor, etc.
 #define DEFAULT_NOMINAL_FILAMENT_DIA 1.75
@@ -409,15 +423,19 @@
  *   998 : Dummy Table that ALWAYS reads 25°C or the temperature defined below.
  *   999 : Dummy Table that ALWAYS reads 100°C or the temperature defined below.
  */
-#define TEMP_SENSOR_0 1
-#define TEMP_SENSOR_1 0
+#define TEMP_SENSOR_0 -1
+#ifdef DUAL
+    #define TEMP_SENSOR_1 -1
+#else
+    #define TEMP_SENSOR_1 0
+#endif
 #define TEMP_SENSOR_2 0
 #define TEMP_SENSOR_3 0
 #define TEMP_SENSOR_4 0
 #define TEMP_SENSOR_5 0
 #define TEMP_SENSOR_6 0
 #define TEMP_SENSOR_7 0
-#define TEMP_SENSOR_BED 0
+#define TEMP_SENSOR_BED 11 //8 keenovo bed heater
 #define TEMP_SENSOR_PROBE 0
 #define TEMP_SENSOR_CHAMBER 0
 #define TEMP_SENSOR_COOLER 0
@@ -465,16 +483,16 @@
 // Above this temperature the heater will be switched off.
 // This can protect components from overheating, but NOT from shorts and failures.
 // (Use MINTEMP for thermistor short/failure protection.)
-#define HEATER_0_MAXTEMP 275
-#define HEATER_1_MAXTEMP 275
-#define HEATER_2_MAXTEMP 275
-#define HEATER_3_MAXTEMP 275
-#define HEATER_4_MAXTEMP 275
-#define HEATER_5_MAXTEMP 275
-#define HEATER_6_MAXTEMP 275
-#define HEATER_7_MAXTEMP 275
-#define BED_MAXTEMP      150
-#define CHAMBER_MAXTEMP  60
+#define HEATER_0_MAXTEMP 500
+#define HEATER_1_MAXTEMP 500
+#define HEATER_2_MAXTEMP 500
+#define HEATER_3_MAXTEMP 500
+#define HEATER_4_MAXTEMP 500
+#define HEATER_5_MAXTEMP 500
+#define HEATER_6_MAXTEMP 500
+#define HEATER_7_MAXTEMP 500
+#define BED_MAXTEMP      250
+#define CHAMBER_MAXTEMP  100
 
 /**
  * Thermal Overshoot
@@ -506,13 +524,29 @@
   #if ENABLED(PID_PARAMS_PER_HOTEND)
     // Specify between 1 and HOTENDS values per array.
     // If fewer than EXTRUDER values are provided, the last element will be repeated.
-    #define DEFAULT_Kp_LIST {  22.20,  22.20 }
-    #define DEFAULT_Ki_LIST {   1.08,   1.08 }
-    #define DEFAULT_Kd_LIST { 114.00, 114.00 }
+    #define DEFAULT_Kp_LIST { 14.68, 14.68 }
+    #define DEFAULT_Ki_LIST {  0.92,  0.92 }
+    #define DEFAULT_Kd_LIST { 58.46, 58.46 }
   #else
-    #define DEFAULT_Kp  22.20
-    #define DEFAULT_Ki   1.08
-    #define DEFAULT_Kd 114.00
+    // 60W E3Dv6
+    #define  DEFAULT_Kp 14.68
+    #define  DEFAULT_Ki  0.92
+    #define  DEFAULT_Kd 58.46
+
+    // N series KS version
+    //#define  DEFAULT_Kp 14.49
+    //#define  DEFAULT_Ki 0.8
+    //#define  DEFAULT_Kd 65.52
+
+    // Test V2 hotend
+    //#define  DEFAULT_Kp 10.65
+    //#define  DEFAULT_Ki 0.39
+    //#define  DEFAULT_Kd 72.40
+
+    // new 300
+    //#define  DEFAULT_Kp 4.12
+    //#define  DEFAULT_Ki 0.12
+    //#define  DEFAULT_Kd 36.03
   #endif
 #endif // PIDTEMP
 
@@ -710,12 +744,12 @@
 #endif
 
 // Mechanical endstop with COM to ground and NC to Signal uses "false" here (most common setup).
-#define X_MIN_ENDSTOP_INVERTING false // Set to true to invert the logic of the endstop.
-#define Y_MIN_ENDSTOP_INVERTING false // Set to true to invert the logic of the endstop.
-#define Z_MIN_ENDSTOP_INVERTING false // Set to true to invert the logic of the endstop.
-#define X_MAX_ENDSTOP_INVERTING false // Set to true to invert the logic of the endstop.
-#define Y_MAX_ENDSTOP_INVERTING false // Set to true to invert the logic of the endstop.
-#define Z_MAX_ENDSTOP_INVERTING false // Set to true to invert the logic of the endstop.
+#define X_MIN_ENDSTOP_INVERTING true // Set to true to invert the logic of the endstop.
+#define Y_MIN_ENDSTOP_INVERTING true // Set to true to invert the logic of the endstop.
+#define Z_MIN_ENDSTOP_INVERTING true // Set to true to invert the logic of the endstop.
+#define X_MAX_ENDSTOP_INVERTING true // Set to true to invert the logic of the endstop.
+#define Y_MAX_ENDSTOP_INVERTING true // Set to true to invert the logic of the endstop.
+#define Z_MAX_ENDSTOP_INVERTING true // Set to true to invert the logic of the endstop.
 #define Z_MIN_PROBE_ENDSTOP_INVERTING false // Set to true to invert the logic of the probe.
 
 /**
@@ -792,14 +826,28 @@
  * following movement settings. If fewer factors are given than the
  * total number of extruders, the last value applies to the rest.
  */
-//#define DISTINCT_E_FACTORS
+#ifdef DUAL
+  #define DISTINCT_E_FACTORS
+#endif
 
 /**
  * Default Axis Steps Per Unit (steps/mm)
  * Override with M92
  *                                      X, Y, Z, E0 [, E1[, E2...]]
  */
-#define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 400, 500 }
+#ifdef BONDTECH_MINI
+  #ifdef DUAL
+    #define DEFAULT_AXIS_STEPS_PER_UNIT   {80, 80, 200*16/4, 140, 476.5}  /* E0 is Bondtech mini (direct drive), E1 is Bondtech QR (for bowden) */
+  #else
+    #define DEFAULT_AXIS_STEPS_PER_UNIT   {80, 80, 200*16/4, 140}  /* Bondtech mini (direct drive) */
+  #endif
+#else
+  #ifdef BONDTECH_BMG
+    #define DEFAULT_AXIS_STEPS_PER_UNIT   {80, 80, 200*16/4, 415}  /* Bondtech BMG extruders(s) (direct drive) */
+  #else
+    #define DEFAULT_AXIS_STEPS_PER_UNIT   {80, 80, 200*16/4, 94}  /* Raise3D stock extruder(s) */
+  #endif
+#endif
 
 /**
  * Default Max Feed Rate (mm/s)
@@ -819,7 +867,7 @@
  * Override with M201
  *                                      X, Y, Z, E0 [, E1[, E2...]]
  */
-#define DEFAULT_MAX_ACCELERATION      { 3000, 3000, 100, 10000 }
+#define DEFAULT_MAX_ACCELERATION      { 9000, 9000, 100, 10000 }  /* Raise3D defaults */
 
 //#define LIMITED_MAX_ACCEL_EDITING     // Limit edit via M201 or LCD to DEFAULT_MAX_ACCELERATION * 2
 #if ENABLED(LIMITED_MAX_ACCEL_EDITING)
@@ -834,9 +882,9 @@
  *   M204 R    Retract Acceleration
  *   M204 T    Travel Acceleration
  */
-#define DEFAULT_ACCELERATION          3000    // X, Y, Z and E acceleration for printing moves
+#define DEFAULT_ACCELERATION          1000    // X, Y, Z and E acceleration for printing moves (Raise3D)
 #define DEFAULT_RETRACT_ACCELERATION  3000    // E acceleration for retracts
-#define DEFAULT_TRAVEL_ACCELERATION   3000    // X, Y, Z acceleration for travel (non printing) moves
+#define DEFAULT_TRAVEL_ACCELERATION   1000    // X, Y, Z acceleration for travel (non printing) moves (Raise3D)
 
 /**
  * Default Jerk limits (mm/s)
@@ -848,8 +896,8 @@
  */
 //#define CLASSIC_JERK
 #if ENABLED(CLASSIC_JERK)
-  #define DEFAULT_XJERK 10.0
-  #define DEFAULT_YJERK 10.0
+  #define DEFAULT_XJERK                 12.0  /* Raise3D defaults */
+  #define DEFAULT_YJERK                 12.0  /* Raise3D defaults */
   #define DEFAULT_ZJERK  0.3
 
   //#define TRAVEL_EXTRA_XYJERK 0.0     // Additional jerk allowance for all travel moves
@@ -1185,7 +1233,7 @@
 
 // Invert the stepper direction. Change (or reverse the motor connector) if an axis goes the wrong way.
 #define INVERT_X_DIR false
-#define INVERT_Y_DIR true
+#define INVERT_Y_DIR false
 #define INVERT_Z_DIR false
 
 // @section extruder
@@ -1226,8 +1274,23 @@
 // @section machine
 
 // The size of the print bed
-#define X_BED_SIZE 200
-#define Y_BED_SIZE 200
+#ifdef N1
+#define X_BED_SIZE 205
+#define Y_BED_SIZE 205
+#define Z_MAX_POS  205
+#endif
+
+#ifdef N2
+#define X_BED_SIZE 305
+#define Y_BED_SIZE 305
+#define Z_MAX_POS  305
+#endif
+
+#ifdef N2PLUS
+#define X_BED_SIZE 312
+#define Y_BED_SIZE 308
+#define Z_MAX_POS  610
+#endif
 
 // Travel limits (mm) after homing, corresponding to endstop positions.
 #define X_MIN_POS 0
@@ -1235,7 +1298,6 @@
 #define Z_MIN_POS 0
 #define X_MAX_POS X_BED_SIZE
 #define Y_MAX_POS Y_BED_SIZE
-#define Z_MAX_POS 200
 
 /**
  * Software Endstops
@@ -1659,9 +1721,10 @@
  *   M501 - Read settings from EEPROM. (i.e., Throw away unsaved changes)
  *   M502 - Revert settings to "factory" defaults. (Follow with M500 to init the EEPROM.)
  */
+// Raise3D EEPROM can be enabled or not
 //#define EEPROM_SETTINGS     // Persistent storage with M500 and M501
 //#define DISABLE_M503        // Saves ~2700 bytes of PROGMEM. Disable for release!
-#define EEPROM_CHITCHAT       // Give feedback on EEPROM commands. Disable to save PROGMEM.
+//#define EEPROM_CHITCHAT       // Give feedback on EEPROM commands. Disable to save PROGMEM.
 #define EEPROM_BOOT_SILENT    // Keep M503 quiet and only give errors during first load
 #if ENABLED(EEPROM_SETTINGS)
   //#define EEPROM_AUTO_INIT  // Init EEPROM automatically on any errors.
@@ -1923,6 +1986,7 @@
  * SD Card support is disabled by default. If your controller has an SD slot,
  * you must uncomment the following option or it won't work.
  */
+// Raise3D don't enable. Dummy MSG_SD_INIT_FAIL sent in end of M503 response.
 //#define SDSUPPORT
 
 /**
@@ -2182,6 +2246,7 @@
 // RepRapDiscount FULL GRAPHIC Smart Controller
 // https://reprap.org/wiki/RepRapDiscount_Full_Graphic_Smart_Controller
 //
+// Raise3D: Can be used or not
 //#define REPRAP_DISCOUNT_FULL_GRAPHIC_SMART_CONTROLLER
 
 //
